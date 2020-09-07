@@ -13,7 +13,6 @@ import { MetricCharacteristic } from "./MetricCharacteristic";
 import { Metric } from "./Metric";
 import { Mineral } from "./Mineral";
 import { CustomEntity } from "./CustomEntity";
-import { findByNameOrAlias } from "@/utils/csv-import";
 
 @Index("metric_mineral_pk", ["id"], { unique: true })
 @Index("metric_mineral_ak_1", ["metricId", "mineralId", "name"], {

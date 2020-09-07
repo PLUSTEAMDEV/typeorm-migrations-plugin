@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn
 } from "typeorm";
 import { CustomEntity } from "./CustomEntity";
-import { ClassificationMetric } from "@/entity/ClassificationMetric";
-import { Attribute } from "@/entity/Attribute";
+import { ClassificationMetric } from "./ClassificationMetric";
+import { Attribute } from "./Attribute";
 @Index("metric_attribute_ak_1", ["attributeId", "classificationMetricId"], {
   unique: true
 })

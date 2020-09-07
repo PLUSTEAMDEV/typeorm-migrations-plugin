@@ -1,6 +1,4 @@
-import * as format from "string-format";
 import {
-  Brackets,
   Column,
   Entity,
   Index,
@@ -14,45 +12,7 @@ import { MetricMineral } from "./MetricMineral";
 import { EquationValue } from "./EquationValue";
 import { MeasureDetail } from "./MeasureDetail";
 import { CustomEntity } from "./CustomEntity";
-import { ENTITY_NOT_FOUND } from "@/utils/errors";
-import { MetricAttribute } from "@/entity/MetricAttribute";
-import { FindManyOptions } from "typeorm/find-options/FindManyOptions";
-
-async function findByMetricNameOrAlias<ClassificationMetric>(
-  name,
-  options: FindManyOptions<ClassificationMetric> = {},
-  findMethod: "find" | "findOne" | "findOrFail"
-): Promise<ClassificationMetric> {
-  const { where = {}, ...otherOptions } = options;
-  try {
-    return await this[findMethod]({
-      ...otherOptions,
-      join: {
-        alias: "classificationMetric",
-        leftJoin: {
-          metricMineral: "classificationMetric.metricMineral",
-          aliases: "metricMineral.aliases"
-        }
-      },
-      where: qb => {
-        qb.where(where).andWhere(
-          new Brackets(qb => {
-            qb.where("metricMineral.name ILIKE :metricName", {
-              metricName: name
-            }).orWhere("aliases.name ILIKE :name", { name });
-          })
-        );
-      }
-    });
-  } catch (e) {
-    throw new Error(
-      format(ENTITY_NOT_FOUND, {
-        entity: this.name,
-        attributes: JSON.stringify({ ...options, name })
-      })
-    );
-  }
-}
+import { MetricAttribute } from "./MetricAttribute";
 
 @Index("classification_metric_ak_1", ["classificationId", "metricMineralId"], {
   unique: true

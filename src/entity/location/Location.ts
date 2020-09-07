@@ -7,13 +7,12 @@ import {
   OneToMany,
   PrimaryGeneratedColumn
 } from "typeorm";
-import { DistinctionValue } from "./DistinctionValue";
-import { SpaceUnit } from "./SpaceUnit";
-import { ParameterValue } from "./ParameterValue";
-import { SpaceTime } from "./SpaceTime";
-import { CustomEntity } from "./CustomEntity";
-import { findOneByIName } from "@/utils/csv-import";
-import { Template } from "@/entity/Template";
+import { DistinctionValue } from "../DistinctionValue";
+import { SpaceUnit } from "../SpaceUnit";
+import { ParameterValue } from "../ParameterValue";
+import { SpaceTime } from "../SpaceTime";
+import { CustomEntity } from "../CustomEntity";
+import { Template } from "../Template";
 
 @Index("location_ak_1", ["locationId", "name"], { unique: true })
 @Entity("location")

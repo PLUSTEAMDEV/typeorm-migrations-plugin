@@ -3,15 +3,31 @@
    "version": "0.0.1",
    "description": "Awesome project developed with TypeORM.",
    "devDependencies": {
-      "ts-node": "3.3.0",
       "@types/node": "^8.0.29",
-      "typescript": "3.3.3333"
+      "@typescript-eslint/eslint-plugin": "^3.10.1",
+      "@typescript-eslint/parser": "^3.10.1",
+      "eslint": "^7.7.0",
+      "eslint-config-prettier": "^6.11.0",
+      "eslint-plugin-prettier": "^3.1.4",
+      "prettier": "^2.1.1"
    },
    "dependencies": {
+      "changed-git-files": "0.0.1",
+      "pg": "^8.3.3",
+      "reflect-metadata": "^0.1.10",
+      "ts-node": "^9.0.0",
+      "tsconfig-paths": "^3.9.0",
       "typeorm": "0.2.25",
-      "reflect-metadata": "^0.1.10"
+      "typescript": "^4.0.2"
    },
    "scripts": {
-      "start": "ts-node src/index.ts"
+      "start": "ts-node src/index.ts",
+      "create:migration:file": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:create -n",
+      "generate:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -n",
+      "generate:migrations:all": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts",
+      "generate:migrations:functions": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts functions",
+      "generate:migrations:triggers": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts triggers",
+      "apply:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run",
+      "revert:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert"
    }
 }

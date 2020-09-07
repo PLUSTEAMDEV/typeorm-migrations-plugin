@@ -12,7 +12,6 @@ import { CharacteristicAlias } from "./CharacteristicAlias";
 import { Distinction } from "./Distinction";
 import { MetricCharacteristic } from "./MetricCharacteristic";
 import { CustomEntity } from "./CustomEntity";
-import { findByNameOrAlias } from "@/utils/csv-import";
 
 @Index("characteristic_pk", ["id"], { unique: true })
 @Index("characteristic_ak_1", ["name"], { unique: true })

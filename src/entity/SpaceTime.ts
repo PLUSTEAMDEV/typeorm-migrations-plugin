@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn
 } from "typeorm";
 import { Measure } from "./Measure";
-import { Location } from "./Location";
+import { Location } from "./location/Location";
 import { TimeUnit } from "./TimeUnit";
 import { CustomEntity } from "./CustomEntity";
 

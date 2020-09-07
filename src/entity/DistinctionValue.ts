@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn
 } from "typeorm";
 import { Distinction } from "./Distinction";
-import { Location } from "./Location";
+import { Location } from "./location/Location";
 import { MetricCharacteristic } from "./MetricCharacteristic";
 import { CustomEntity } from "./CustomEntity";
 

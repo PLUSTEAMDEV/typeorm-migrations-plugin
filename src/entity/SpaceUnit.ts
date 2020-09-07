@@ -7,11 +7,10 @@ import {
   OneToMany,
   PrimaryGeneratedColumn
 } from "typeorm";
-import { Location } from "./Location";
+import { Location } from "./location/Location";
 import { SpaceUnitAlias } from "./SpaceUnitAlias";
 import { CustomEntity } from "./CustomEntity";
-import { findByNameOrAlias } from "@/utils/csv-import";
-import { Template } from "@/entity/Template";
+import { Template } from "./Template";
 
 @Index("space_unit_pk", ["id"], { unique: true })
 @Index("space_unit_ak_1", ["name"], { unique: true })

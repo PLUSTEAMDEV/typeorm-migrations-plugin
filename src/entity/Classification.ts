@@ -11,7 +11,7 @@ import {
 import { ClassificationMetric } from "./ClassificationMetric";
 import { Factor } from "./Factor";
 import { CustomEntity } from "./CustomEntity";
-import { Template } from "@/entity/Template";
+import { Template } from "./Template";
 
 @Index("classification_ak_1", ["abbreviation"], { unique: true })
 @Index("classification_pk", ["id"], { unique: true })

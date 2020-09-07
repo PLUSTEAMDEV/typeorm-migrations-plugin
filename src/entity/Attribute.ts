@@ -9,8 +9,8 @@ import {
 } from "typeorm";
 import { AttributeType } from "./AttributeType";
 import { CustomEntity } from "./CustomEntity";
-import { Import } from "@/entity/Import";
-import { MetricAttribute } from "@/entity/MetricAttribute";
+
+import { MetricAttribute } from "./MetricAttribute";
 
 @Index("attribute_pk", ["id"], { unique: true })
 @Index("attribute_ak_1", ["name"], { unique: true })

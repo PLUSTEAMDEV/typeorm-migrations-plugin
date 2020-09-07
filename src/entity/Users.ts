@@ -1,6 +1,6 @@
 import { Entity, Index, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { CustomEntity } from "./CustomEntity";
-import { Import } from "@/entity/Import";
+import { Import } from "./import/Import";
 
 @Index("users_pk", ["id"], { unique: true })
 @Entity("users")

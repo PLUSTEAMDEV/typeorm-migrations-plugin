@@ -8,13 +8,11 @@ import {
   PrimaryGeneratedColumn
 } from "typeorm";
 import { CustomEntity } from "./CustomEntity";
-import { Classification } from "@/entity/Classification";
-import { SpaceUnit } from "@/entity/SpaceUnit";
-import { Location } from "@/entity/Location";
-import { Import } from "@/entity/Import";
-import { TemplateType } from "@/entity/TemplateType";
-import { ITemplateValue } from "@/importer/interfaces";
-import { FileTemplateHeader } from "@/types";
+import { Classification } from "./Classification";
+import { SpaceUnit } from "./SpaceUnit";
+import { Location } from "./location/Location";
+import { Import } from "./import/Import";
+import { TemplateType } from "./TemplateType";
 
 @Index("template_pk", ["id"], { unique: true })
 @Entity("template")
@@ -26,7 +24,7 @@ export class Template extends CustomEntity {
   name: string;
 
   @Column("jsonb", { name: "parameters" })
-  value: object & ITemplateValue;
+  value: object;
 
   @ManyToOne(
     () => TemplateType,
@@ -62,8 +60,4 @@ export class Template extends CustomEntity {
   )
   imports: Import[];
 
-  get ignoredHeaders(): FileTemplateHeader[] {
-    if (!this.value.headers) return [];
-    return this.value.headers.filter(({ type }) => type === "Ignored");
-  }
 }
