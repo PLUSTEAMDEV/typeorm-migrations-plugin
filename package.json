@@ -21,12 +21,13 @@
       "typescript": "^4.0.2"
    },
    "scripts": {
-      "start": "ts-node src/index.ts",
+      "services:db": "docker-compose -f docker-compose.yaml up -d test-db",
       "create:migration:file": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:create -n",
       "generate:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -n",
-      "generate:migrations:all": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts",
-      "generate:migrations:functions": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts functions",
-      "generate:migrations:triggers": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts triggers",
+      "generate:migrations:all": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts all & ts-node -r ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -n",
+      "generate:migrations:functions": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts function",
+      "generate:migrations:triggers": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts trigger",
+      "generate:migrations:extensions": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts extension",
       "apply:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run",
       "revert:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert"
    }

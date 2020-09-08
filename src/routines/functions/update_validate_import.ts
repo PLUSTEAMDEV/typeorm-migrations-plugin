@@ -31,7 +31,7 @@ const update_validate_import: DatabaseFunction = {
    cost 100;
  `,
   afterCreated: `
-    alter function update_validate_import() owner to postgres;
+    alter function update_validate_import() owner to plusteam;
   `
 };
 

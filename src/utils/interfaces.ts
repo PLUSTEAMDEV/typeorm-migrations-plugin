@@ -19,11 +19,17 @@ export interface DatabaseFunction {
 
 export interface Trigger {
   name: string,
-  logic: string
+  logic: string,
   table: string
 }
 
-export interface LogicFunctions {
-  up: string;
-  down: string;
+export interface Extension {
+  name: string,
+  comments: string,
+  schema: string
+}
+
+export interface databaseStructure {
+  path: string,
+  logicType: string
 }

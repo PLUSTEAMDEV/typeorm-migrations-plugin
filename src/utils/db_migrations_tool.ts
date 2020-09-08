@@ -4,11 +4,16 @@ import * as ORM_CONFIG from "@root/ormconfig";
 import {
   TRIGGER_LOGIC_UP,
   FUNCTION_LOGIC_UP,
-  STRUCTURE_DOWN,
+  LOGIC_DOWN,
+  EXTENSION_LOGIC_UP,
+  EXTENSION_LOGIC_DOWN,
 } from "./constants";
-import { MigrationFunctions } from "@/utils/interfaces";
+import { MigrationFunctions, databaseStructure } from "@/utils/interfaces";
+import { EXTENSIONS } from "./db_tools";
 const mkdirp = require("mkdirp");
 const cgf = require("changed-git-files");
+
+let args = process.argv.slice(2);
 
 function createDirectories(directory: string) {
   return mkdirp(directory);
@@ -51,14 +56,40 @@ function getTemplate(
     }`;
 }
 
+function getTemplateForExtensions(
+  name: string,
+  timestamp: number,
+  importRoute: string,
+  logic: MigrationFunctions
+): string {
+  return `import {MigrationInterface, QueryRunner} from "typeorm";
+  ${importRoute};
+    export class ${name}${timestamp} implements MigrationInterface {
+        public async up(queryRunner: QueryRunner): Promise<void> {
+          ${logic.up}
+        }
+        public async down(queryRunner: QueryRunner): Promise<void> {
+          ${logic.down}
+        }
+    }`;
+}
+
 function defineMigrationLogic(typeLogic: string): MigrationFunctions {
+  const UP =
+    typeLogic == "trigger"
+      ? TRIGGER_LOGIC_UP
+      : typeLogic == "extension"
+      ? EXTENSION_LOGIC_UP
+      : FUNCTION_LOGIC_UP;
   return {
-    up: typeLogic == "trigger" ? TRIGGER_LOGIC_UP : FUNCTION_LOGIC_UP,
-    down: STRUCTURE_DOWN,
+    up: UP,
+    down: typeLogic == "extension" ? EXTENSION_LOGIC_DOWN : LOGIC_DOWN,
   };
 }
 
-async function createMigrationFile(structureChanged): Promise<void> {
+async function createMigrationFile(
+  structureChanged: databaseStructure
+): Promise<void> {
   try {
     const timestamp = new Date().getTime();
     const logic = defineMigrationLogic(structureChanged.logicType);
@@ -82,28 +113,64 @@ async function createMigrationFile(structureChanged): Promise<void> {
   }
 }
 
-function isMigrationRoute(filename: string): boolean {
+async function createMigrationFileForExtensions(): Promise<void> {
+  try {
+    const timestamp = new Date().getTime();
+    const name = path.basename("extensions");
+    const importRoute = `import { EXTENSIONS } from "@/utils/db_tools"`;
+    const logic = defineMigrationLogic("extension");
+    const fileContent = getTemplateForExtensions(
+      name,
+      timestamp,
+      importRoute,
+      logic
+    );
+    const filename = timestamp + "-" + name + ".ts";
+    let directory = "src/migration";
+    const pathOfFile =
+      process.cwd() + "/" + (directory ? directory + "/" : "") + filename;
+    await createFile(pathOfFile, fileContent);
+    console.log(`Migration has been generated successfully.`);
+  } catch (err) {
+    console.log("Error during migration creation:");
+    console.error(err);
+    process.exit(1);
+  }
+}
+
+function isMigrationRoute(structure: databaseStructure): boolean {
   return (
-    filename.includes(ORM_CONFIG[1][0]) || filename.includes(ORM_CONFIG[1][1])
+    (structure.logicType == args[0] || args[0] == "all") &&
+    (structure.path.includes(ORM_CONFIG[1][0]) ||
+      structure.path.includes(ORM_CONFIG[1][1]))
   );
 }
 
-let structuresChanged: string[] = [];
-function getStructure(filename): object {
+let structuresChanged: databaseStructure[] = [];
+
+function getStructure(filename): databaseStructure {
   return {
     path: filename.replace(".ts", ""),
     logicType: filename.includes(ORM_CONFIG[1][0]) ? "function" : "trigger",
   };
 }
-/**
- * Gets the path of the changed files (triggers and functions).
- */
-cgf(async function (err, results): Promise<void> {
-  structuresChanged = results
-    .map((files) => getStructure(files.filename))
-    .filter((structure) => isMigrationRoute(structure.path));
-  console.log(structuresChanged);
-  for (let structure of structuresChanged) {
-    await createMigrationFile(structure);
-  }
-});
+
+if (args[0] == "extension") {
+  createMigrationFileForExtensions();
+} else {
+  /**
+   * Gets the path of the changed files (triggers and functions).
+   */
+  cgf(async function (err, results): Promise<void> {
+    structuresChanged = results
+      .map((files) => getStructure(files.filename))
+      .filter((structure) => isMigrationRoute(structure));
+    if (structuresChanged.length === 0) {
+      console.log("There are not changes in the structures.");
+    } else {
+      for (let structure of structuresChanged) {
+        await createMigrationFile(structure);
+      }
+    }
+  });
+}

@@ -30,7 +30,7 @@ const check_parent: DatabaseFunction = {
     language PLPGSQL volatile
     cost 100;`,
   afterCreated: `
-    alter function check_parent() owner to postgres;
+    alter function check_parent() owner to plusteam;
   `
 };
 

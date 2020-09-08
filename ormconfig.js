@@ -4,13 +4,13 @@ const DEFAULT_CONNECTION = {
    type: "postgres",
    host: DB_HOSTNAME || "localhost",
    port: DB_PORT || 5434,
-   username: DB_USER || "postgres",
+   username: DB_USER || "plusteam",
    password: DB_PASSWORD || "admin",
-   database: DB_DATABASE || "dbtest",
+   database: DB_DATABASE || "test_migrations",
 
    synchronize: false,
    logging: false,
-   entities: ["src/entity/**/*.ts"],
+   entities: ["src/entity/**/*.ts", "src/view/*.ts"],
    migrations: ["src/migration/**/*.ts"],
    subscribers: ["src/subscriber/**/*.ts"],
    cli: {
@@ -21,4 +21,16 @@ const DEFAULT_CONNECTION = {
    extra: { max: 50 }
 };
 const MIGRATION_ROUTES = ["src/routines/functions", "triggers"];
-module.exports = [DEFAULT_CONNECTION, MIGRATION_ROUTES];
+const EXTENSIONS = [
+   {
+      name: "postgis",
+      comments: "PostGIS geometry, geography, and raster spatial types and functions",
+      schema: "public"
+   },
+   {
+      name: "unit",
+      comments: "SI units extension",
+      schema: "public"
+   }
+]
+module.exports = [DEFAULT_CONNECTION, MIGRATION_ROUTES, EXTENSIONS];

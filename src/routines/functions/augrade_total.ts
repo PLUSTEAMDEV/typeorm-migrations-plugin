@@ -126,7 +126,7 @@ const augrade_total: DatabaseFunction = {
     language PLPGSQL volatile
     cost 100;`,
   afterCreated: `
-    alter function augrade_total(IN from_calc timestamp without time zone, IN to_calc timestamp without time zone, IN id_time_unit character varying, IN id_location integer, IN id_classification integer, IN id_space integer) owner to postgres;
+    alter function augrade_total(IN from_calc timestamp without time zone, IN to_calc timestamp without time zone, IN id_time_unit character varying, IN id_location integer, IN id_classification integer, IN id_space integer) owner to plusteam;
   `
 };
 

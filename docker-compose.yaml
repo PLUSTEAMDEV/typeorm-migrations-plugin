@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  test-db:
+    container_name: test-db
+    volumes:
+      - edv-data:/var/lib/postgresql
+    restart: unless-stopped
+    ports:
+      - 5434:5432
+    networks:
+      - backend
+      - frontend
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_USER: plusteam
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: test_migrations
+
+volumes:
+  edv-data:
+
+networks:
+  backend:
+    external:
+      name: edv_backend
+  frontend:
+    external:
+      name: edv_frontend

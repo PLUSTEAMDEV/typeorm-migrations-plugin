@@ -11,6 +11,21 @@ export const FUNCTION_LOGIC_UP: string = `
     } 
 `;
 
-export const STRUCTURE_DOWN: string = `
+export const LOGIC_DOWN: string = `
     await queryRunner.query(migrationStructure.down);
+`;
+
+export const EXTENSION_LOGIC_UP: string = `
+  for (let extension of EXTENSIONS) {
+    if (typeof extension.up !== "string") {
+      await queryRunner.query(extension.up.create);
+      await queryRunner.query(extension.up.afterCreated);
+    }
+  }
+`;
+
+export const EXTENSION_LOGIC_DOWN: string = `
+  for (let extension of EXTENSIONS) {
+    await queryRunner.query(extension.down);
+  }
 `;
