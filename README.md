@@ -3,7 +3,7 @@
 ## Steps to run the project:
 
 1. Run `npm i` command
-2. Run `npm run services:db` command to run de Docker container for the postgres database.
+2. Run `npm run services:db` command to run the Docker container for the postgres database.
 
 ## Documentation for the commands:
 

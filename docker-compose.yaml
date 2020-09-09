@@ -15,9 +15,9 @@ services:
       context: ./db
       dockerfile: Dockerfile
     environment:
-      POSTGRES_USER: plusteam
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: test_migrations
+      POSTGRES_USER: ${RECON_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${RECON_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${RECON_POSTGRES_DB}
 
 volumes:
   edv-data:
