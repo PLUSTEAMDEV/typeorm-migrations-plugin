@@ -1,0 +1,108 @@
+- table:
+    schema: public
+    name: attribute
+- table:
+    schema: public
+    name: attribute_type
+- table:
+    schema: public
+    name: characteristic
+- table:
+    schema: public
+    name: characteristic_alias
+- table:
+    schema: public
+    name: characteristic_type
+- table:
+    schema: public
+    name: classification
+- table:
+    schema: public
+    name: classification_metric
+- table:
+    schema: public
+    name: company
+- table:
+    schema: public
+    name: distinction
+- table:
+    schema: public
+    name: distinction_value
+- table:
+    schema: public
+    name: equation_value
+- table:
+    schema: public
+    name: factor
+- table:
+    schema: public
+    name: import
+- table:
+    schema: public
+    name: import_file
+- table:
+    schema: public
+    name: import_status
+- table:
+    schema: public
+    name: location
+- table:
+    schema: public
+    name: measure
+- table:
+    schema: public
+    name: measure_detail
+- table:
+    schema: public
+    name: measure_distinction
+- table:
+    schema: public
+    name: metric
+- table:
+    schema: public
+    name: metric_alias
+- table:
+    schema: public
+    name: metric_attribute
+- table:
+    schema: public
+    name: metric_characteristic
+- table:
+    schema: public
+    name: metric_mineral
+- table:
+    schema: public
+    name: migrations
+- table:
+    schema: public
+    name: mineral
+- table:
+    schema: public
+    name: parameter
+- table:
+    schema: public
+    name: parameter_value
+- table:
+    schema: public
+    name: space_time
+- table:
+    schema: public
+    name: space_unit
+- table:
+    schema: public
+    name: space_unit_alias
+- table:
+    schema: public
+    name: template
+- table:
+    schema: public
+    name: template_type
+- table:
+    schema: public
+    name: time_unit
+- table:
+    schema: public
+    name: typeorm_metadata
+- table:
+    schema: public
+    name: users

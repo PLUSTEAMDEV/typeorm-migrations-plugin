@@ -6,5 +6,4 @@ build/
 tmp/
 temp/
 backups
-.env
 config.yaml

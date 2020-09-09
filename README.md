@@ -1,56 +1,46 @@
-# TypeORM migrations
+# Hasura migrations
 
 ## Steps to run the project:
 
 1. Run `npm i` command
-2. Run `npm run services:db` command to run de Docker container for the postgres database.
+2. Run `npm run services:db` command to run the Docker container for the postgres database.
+3. Run `npm run services:hasura` command to run the container for Hasura.
 
 ## Documentation for the commands:
 
-`create:migration:file -- name` : Creates an empty migration file with filename = name, where you can fill the up and down functions.
+`hasura:init -- endpoint` : This is the first commando to run if we want to configure hasura and the /hasura folder 
+does not exist. It creates the hasura folder and generates a config.yaml file to keep some variables for the connection
+to the hasura container and console.
+The endpoint is the url where hasura is running.
 - Example:
 ```
-npm run create:migration:file -- update_table 
+npm run hasura:init -- http://xx.xx.xx.xx:port_number 
 ```
 
-`generate:migrations -- name` : This is the TypeORM command to generate migrations, it creates a migration file with the last changes in the Entities and the Views.
+`hasura:migrate -- name` : Creates an empty migration file with filename = name, where you can fill the up and down file with SQL.
 - Example:
 ```
-npm run generate:migrations -- delete_field_in_table 
+npm run hasura:migrate -- update_field_in_table 
 ```
 
-`generate:migrations:all` : Creates migration files with the last changes in the Entities, Triggers, Functions and Views.
+`hasura:migrations:status` : Creates an empty migration file with filename = name, where you can fill the up and down file with SQL.
 - Example:
 ```
-npm run generate:migrations:all 
+npm run hasura:migrations:status
 ```
 
-`generate:migrations:functions` : Detects the changes in the routines/functions folder and generate 1 migration file for each function.
+`hasura:console` : Activate the hasura console to make changes in the schema.
 - Example:
 ```
-npm run generate:migrations:functions 
+npm run hasura:console
 ```
 
-`generate:migrations:triggers` : Detects the changes in the entity/**/triggers folders and generate 1 migration file for each trigger.
+`hasura:apply` : Apply the migrations that are not present in the database status.
 - Example:
 ```
-npm run generate:migrations:triggers 
+npm run hasura:apply
 ```
-
-`generate:migrations:extension` : It takes the Extensions in the ormconfig.js file and generate a migration file with all of it. We recommend running this command with the initial migrations step. Note: The Extensions needs to be installed first to apply them.
-- Example:
+To revert a migration we need its number of version and run:
 ```
-npm run generate:migrations:extension 
-```
-
-`apply:migrations` : It uses the TypeORM run command to apply all the changes in the migration folder to the database.
-- Example:
-```
-npm run apply:migrations 
-```
-
-`revert:migrations` : It uses the TypeORM revert command to revert all the changes in the last applied migration.
-- Example:
-```
-npm run revert:migrations 
+npm run hasura:apply -- --version 1599684647148 --type down
 ```

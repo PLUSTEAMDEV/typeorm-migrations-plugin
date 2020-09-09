@@ -9,6 +9,7 @@
       "eslint": "^7.7.0",
       "eslint-config-prettier": "^6.11.0",
       "eslint-plugin-prettier": "^3.1.4",
+      "hasura-cli": "^1.3.1",
       "prettier": "^2.1.1"
    },
    "dependencies": {
@@ -22,13 +23,11 @@
    },
    "scripts": {
       "services:db": "docker-compose -f docker-compose.yaml up -d test-db",
-      "create:migration:file": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:create -n",
-      "generate:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -n",
-      "generate:migrations:all": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts all & ts-node -r ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -n",
-      "generate:migrations:functions": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts function",
-      "generate:migrations:triggers": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts trigger",
-      "generate:migrations:extensions": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts extension",
-      "apply:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run",
-      "revert:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert"
+      "services:hasura": "docker-compose -f docker-compose.yaml up -d test-hasura",
+      "hasura:init": "hasura init hasura --endpoint",
+      "hasura:migrate": "cd hasura && hasura migrate create",
+      "hasura:migrations:status": "cd hasura && hasura migrate status",
+      "hasura:console": "cd hasura && hasura console",
+      "hasura:apply": " cd hasura && hasura migrate apply"
    }
 }

@@ -15,9 +15,31 @@ services:
       context: ./db
       dockerfile: Dockerfile
     environment:
-      POSTGRES_USER: plusteam
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: test_migrations
+      POSTGRES_USER: ${RECON_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${RECON_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${RECON_POSTGRES_DB}
+
+  test-hasura:
+    image: hasura/graphql-engine:v1.3.0.cli-migrations-v2
+    container_name: test-hasura
+    restart: always
+    volumes:
+      - ./hasura/migrations:/hasura-migrations
+      - ./hasura/metadata:/hasura-metadata
+    depends_on:
+      - test-db
+    networks:
+      - backend
+      - frontend
+    ports:
+      - ${RECON_HASURA_PORT}:8080
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://${RECON_POSTGRES_USER}:${RECON_POSTGRES_PASSWORD}@test-db/${RECON_POSTGRES_DB}
+      HASURA_GRAPHQL_ENABLE_CONSOLE: ${RECON_HASURA_CONSOLE}
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+      ## uncomment next line to set an admin secret
+      HASURA_GRAPHQL_ADMIN_SECRET: ${RECON_HASURA_SECRET}
+      HASURA_GRAPHQL_CORS_DOMAIN: ${DOMAINS_CORS_WHITELIST}
 
 volumes:
   edv-data:
