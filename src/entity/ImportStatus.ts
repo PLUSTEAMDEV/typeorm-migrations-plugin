@@ -1,6 +1,6 @@
 import { Column, Entity, Index, OneToMany } from "typeorm";
 import { CustomEntity } from "./CustomEntity";
-import { Import } from "./import/Import";
+import { Import } from "./import/import";
 @Index("import_status_pk", ["status"], { unique: true })
 @Entity("import_status")
 export class ImportStatus extends CustomEntity {

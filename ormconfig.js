@@ -10,7 +10,7 @@ const DEFAULT_CONNECTION = {
 
    synchronize: false,
    logging: false,
-   entities: ["src/entity/**/*.ts", "src/view/*.ts"],
+   entities: ["src/entity/**/**/*.ts", "src/view/*.ts"],
    migrations: ["src/migration/**/*.ts"],
    subscribers: ["src/subscriber/**/*.ts"],
    cli: {

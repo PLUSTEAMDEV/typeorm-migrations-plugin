@@ -10,7 +10,7 @@ import { SpaceTime } from "./SpaceTime";
 import { MeasureDetail } from "./MeasureDetail";
 import { MeasureDistinction } from "./MeasureDistinction";
 import { CustomEntity } from "./CustomEntity";
-import {Import} from "./import/Import";
+import {Import} from "./import/import";
 
 @Index("measure_pk", ["id"], { unique: true })
 @Entity("measure")

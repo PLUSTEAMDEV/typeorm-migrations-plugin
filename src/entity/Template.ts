@@ -11,7 +11,7 @@ import { CustomEntity } from "./CustomEntity";
 import { Classification } from "./Classification";
 import { SpaceUnit } from "./SpaceUnit";
 import { Location } from "./location/Location";
-import { Import } from "./import/Import";
+import { Import } from "./import/import";
 import { TemplateType } from "./TemplateType";
 
 @Index("template_pk", ["id"], { unique: true })

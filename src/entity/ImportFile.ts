@@ -6,7 +6,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn
 } from "typeorm";
-import { Import } from "./import/Import";
+import { Import } from "./import/import";
 
 @Index("import_file_pk", ["id"], { unique: true })
 @Entity("import_file")
