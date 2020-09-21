@@ -1,10 +1,10 @@
 import {MigrationFunctions, Trigger, DatabaseFunction, Extension} from "@/utils/interfaces";
-import * as ORM_CONFIG from "@root/ormconfig";
+const EXTENSIONS = require('ormconfig');
 
 export function triggerConstructor(trigger: Trigger): MigrationFunctions {
   return {
-    up: `CREATE trigger ${trigger.name} ${trigger.logic}`,
-    down: `DROP trigger ${trigger.name} ON ${trigger.table}`
+    up: `CREATE TRIGGER ${trigger.name} ${trigger.logic}`,
+    down: `DROP TRIGGER ${trigger.name} ON ${trigger.table}`
   };
 }
 
@@ -28,4 +28,4 @@ function extensionConstructor(extension: Extension): MigrationFunctions {
   };
 }
 
-export const EXTENSIONS = ORM_CONFIG[2].map(extensionConstructor);
+export const CONSTRUCTED_EXTENSIONS = EXTENSIONS.map(extensionConstructor);

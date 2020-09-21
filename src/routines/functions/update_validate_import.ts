@@ -1,10 +1,11 @@
 import { functionConstructor } from "@/utils/db_tools";
 import { DatabaseFunction } from "@/utils/interfaces";
+const USERNAME = require('ormconfig');
 
 const update_validate_import: DatabaseFunction = {
   name: "update_validate_import",
-  logic: `function update_validate_import()
-    returns trigger as 
+  logic: `FUNCTION update_validate_import()
+    RETURNS trigger AS 
     $BODY$ 
     BEGIN
         IF OLD.status = 'approved' THEN
@@ -31,7 +32,7 @@ const update_validate_import: DatabaseFunction = {
    cost 100;
  `,
   afterCreated: `
-    alter function update_validate_import() owner to plusteam;
+    ALTER FUNCTION update_validate_import() OWNER TO ${USERNAME};
   `
 };
 

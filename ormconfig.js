@@ -1,5 +1,5 @@
 const { DB_HOSTNAME, DB_PORT, DB_USER, DB_PASSWORD, DB_DATABASE } = process.env;
-const DEFAULT_CONNECTION = {
+export const DEFAULT_CONNECTION = {
    name: "default",
    type: "postgres",
    host: DB_HOSTNAME || "localhost",
@@ -32,5 +32,8 @@ const EXTENSIONS = [
       comments: "SI units extension",
       schema: "public"
    }
-]
-module.exports = [DEFAULT_CONNECTION, MIGRATION_ROUTES, EXTENSIONS];
+];
+module.exports = [DEFAULT_CONNECTION];
+exports.MIGRATION_ROUTES = MIGRATION_ROUTES;
+exports.EXTENSIONS = EXTENSIONS;
+exports.USERNAME = DEFAULT_CONNECTION.username;

@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as ORM_CONFIG from "@root/ormconfig";
+const MIGRATION_ROUTES = require('ormconfig');
 import {
   TRIGGER_LOGIC_UP,
   FUNCTION_LOGIC_UP,
@@ -9,7 +9,6 @@ import {
   EXTENSION_LOGIC_DOWN,
 } from "./constants";
 import { MigrationFunctions, databaseStructure } from "@/utils/interfaces";
-import { EXTENSIONS } from "./db_tools";
 const mkdirp = require("mkdirp");
 const cgf = require("changed-git-files");
 
@@ -141,8 +140,8 @@ async function createMigrationFileForExtensions(): Promise<void> {
 function isMigrationRoute(structure: databaseStructure): boolean {
   return (
     (structure.logicType == args[0] || args[0] == "all") &&
-    (structure.path.includes(ORM_CONFIG[1][0]) ||
-      structure.path.includes(ORM_CONFIG[1][1]))
+    (structure.path.includes(MIGRATION_ROUTES[0]) ||
+      structure.path.includes(MIGRATION_ROUTES[1]))
   );
 }
 
@@ -151,7 +150,7 @@ let structuresChanged: databaseStructure[] = [];
 function getStructure(filename): databaseStructure {
   return {
     path: filename.replace(".ts", ""),
-    logicType: filename.includes(ORM_CONFIG[1][0]) ? "function" : "trigger",
+    logicType: filename.includes(MIGRATION_ROUTES[0]) ? "function" : "trigger",
   };
 }
 

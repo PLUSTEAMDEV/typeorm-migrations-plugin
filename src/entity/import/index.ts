@@ -15,8 +15,10 @@ import { ImportFile } from "../importFile";
 import { Measure } from "../measure";
 import { ImportStatus } from "../importStatus";
 
+export const TABLE_NAME = "import";
+
 @Index("import_pk", ["id"], { unique: true })
-@Entity("import")
+@Entity(TABLE_NAME)
 export class Import extends BaseEntity {
   @PrimaryGeneratedColumn({ type: "integer", name: "id" })
   id: number;

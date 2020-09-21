@@ -1,5 +1,6 @@
 import { functionConstructor } from "@/utils/db_tools";
 import { DatabaseFunction } from "@/utils/interfaces";
+const USERNAME = require('ormconfig');
 
 const check_parent: DatabaseFunction = {
   name: "check_parent",
@@ -30,7 +31,7 @@ const check_parent: DatabaseFunction = {
     language PLPGSQL volatile
     cost 100;`,
   afterCreated: `
-    alter function check_parent() owner to plusteam;
+    ALTER FUNCTION check_parent() OWNER TO ${USERNAME};
   `
 };
 

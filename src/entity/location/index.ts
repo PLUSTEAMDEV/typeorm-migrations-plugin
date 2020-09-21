@@ -14,8 +14,10 @@ import { SpaceTime } from "../spaceTime";
 import { CustomEntity } from "../customEntity";
 import { Template } from "../template";
 
+export const TABLE_NAME = "location";
+
 @Index("location_ak_1", ["locationId", "name"], { unique: true })
-@Entity("location")
+@Entity(TABLE_NAME)
 export class Location extends CustomEntity {
   @PrimaryGeneratedColumn({ type: "integer", name: "id" })
   id: number;

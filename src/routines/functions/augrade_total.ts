@@ -1,10 +1,11 @@
 import { functionConstructor } from "@/utils/db_tools";
 import { DatabaseFunction } from "@/utils/interfaces";
+const USERNAME = require('ormconfig');
 
 const augrade_total: DatabaseFunction = {
   name: "augrade_total",
-  logic: `function augrade_total(IN from_calc timestamp without time zone, IN to_calc timestamp without time zone, IN id_time_unit character varying, IN id_location integer, IN id_classification integer, IN id_space integer)
-  returns numeric as 
+  logic: `FUNCTION augrade_total(IN from_calc timestamp without time zone, IN to_calc timestamp without time zone, IN id_time_unit character varying, IN id_location integer, IN id_classification integer, IN id_space integer)
+  RETURNS NUMERIC AS 
   $BODY$ 
   DECLARE
       metric  RECORD;
@@ -126,7 +127,7 @@ const augrade_total: DatabaseFunction = {
     language PLPGSQL volatile
     cost 100;`,
   afterCreated: `
-    alter function augrade_total(IN from_calc timestamp without time zone, IN to_calc timestamp without time zone, IN id_time_unit character varying, IN id_location integer, IN id_classification integer, IN id_space integer) owner to plusteam;
+    ALTER FUNCTION augrade_total(IN from_calc timestamp without time zone, IN to_calc timestamp without time zone, IN id_time_unit character varying, IN id_location integer, IN id_classification integer, IN id_space integer) owner to ${USERNAME};
   `
 };
 
