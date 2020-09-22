@@ -1,12 +1,28 @@
-import { functionConstructor } from "@/utils/db_tools";
-import { DatabaseFunction } from "@/utils/interfaces";
-const USERNAME = require('ormconfig');
+import { Routine } from "@/utils/db_classes";
+import {grantAccessToRoutine} from "@/utils/db_tools";
+import {afterCreatedFunction} from "@/utils/interfaces";
+const ORM_CONFIG = require('ormconfig');
 
-const augrade_total: DatabaseFunction = {
-  name: "augrade_total",
-  logic: `FUNCTION augrade_total(IN from_calc timestamp without time zone, IN to_calc timestamp without time zone, IN id_time_unit character varying, IN id_location integer, IN id_classification integer, IN id_space integer)
-  RETURNS NUMERIC AS 
-  $BODY$ 
+const functionName = "augrade_total";
+
+class AugradeTotal extends Routine {
+  constructor(
+    name: string,
+    expression: string,
+    afterCreated: afterCreatedFunction[]
+  ) {
+    super(name, expression, afterCreated);
+  }
+}
+
+const augrade_total = new AugradeTotal(
+  functionName,
+  `FUNCTION public.${functionName}(from_calc timestamp without time zone, to_calc timestamp without time zone,
+                                     id_time_unit character varying, id_location integer, id_classification integer,
+                                     id_space integer) RETURNS numeric
+      LANGUAGE plpgsql
+  AS
+  $$
   DECLARE
       metric  RECORD;
       tonnes  REAL;
@@ -122,13 +138,13 @@ const augrade_total: DatabaseFunction = {
       END IF;
       RETURN ROUND(augrade::NUMERIC, 2);
   END ;
-  $BODY$`,
-  options: `
-    language PLPGSQL volatile
-    cost 100;`,
-  afterCreated: `
-    ALTER FUNCTION augrade_total(IN from_calc timestamp without time zone, IN to_calc timestamp without time zone, IN id_time_unit character varying, IN id_location integer, IN id_classification integer, IN id_space integer) owner to ${USERNAME};
-  `
-};
+  $$;`,
+  [
+    {
+      func: grantAccessToRoutine,
+      params: [ORM_CONFIG[0].username]
+    }
+  ]
+);
 
-export default functionConstructor(augrade_total);
+export default augrade_total.queryConstructor();

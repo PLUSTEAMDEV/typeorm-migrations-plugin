@@ -1,16 +1,15 @@
+import { format } from "@sqltools/formatter/lib/sqlFormatter";
 import * as fs from "fs";
 import * as path from "path";
-const MIGRATION_ROUTES = require('ormconfig');
-import {
-  TRIGGER_LOGIC_UP,
-  FUNCTION_LOGIC_UP,
-  LOGIC_DOWN,
-  EXTENSION_LOGIC_UP,
-  EXTENSION_LOGIC_DOWN,
-} from "./constants";
-import { MigrationFunctions, databaseStructure } from "@/utils/interfaces";
+const ORM_CONFIG = require("ormconfig");
 const mkdirp = require("mkdirp");
 const cgf = require("changed-git-files");
+import {
+  MigrationFunctions,
+  databaseStructure,
+  queryManager,
+} from "@/utils/interfaces";
+import { CONSTRUCTED_EXTENSIONS } from "@/utils/db_tools";
 
 let args = process.argv.slice(2);
 
@@ -34,96 +33,60 @@ export async function createFile(
   });
 }
 
-/**
- * Gets contents of the migration file.
- */
+function prettifyQuery(query: string) {
+  const formattedQuery = format(query, { indent: "    " });
+  return "\n" + formattedQuery.replace(/^/gm, "            ") + "\n        ";
+}
+
 function getTemplate(
   name: string,
   timestamp: number,
-  importRoute: string,
-  logic: MigrationFunctions
+  up: string,
+  down: string
 ): string {
   return `import {MigrationInterface, QueryRunner} from "typeorm";
-   import migrationStructure from "${importRoute}";
-    export class ${name}${timestamp} implements MigrationInterface {
-        public async up(queryRunner: QueryRunner): Promise<void> {
-          ${logic.up}
-        }
-        public async down(queryRunner: QueryRunner): Promise<void> {
-          ${logic.down}
-        }
-    }`;
+export class ${name}${timestamp} implements MigrationInterface {
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    ${up}
+  }
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    ${down}
+  }
+}`;
 }
 
-function getTemplateForExtensions(
-  name: string,
-  timestamp: number,
-  importRoute: string,
-  logic: MigrationFunctions
-): string {
-  return `import {MigrationInterface, QueryRunner} from "typeorm";
-  ${importRoute};
-    export class ${name}${timestamp} implements MigrationInterface {
-        public async up(queryRunner: QueryRunner): Promise<void> {
-          ${logic.up}
-        }
-        public async down(queryRunner: QueryRunner): Promise<void> {
-          ${logic.down}
-        }
-    }`;
-}
-
-function defineMigrationLogic(typeLogic: string): MigrationFunctions {
-  const UP =
-    typeLogic == "trigger"
-      ? TRIGGER_LOGIC_UP
-      : typeLogic == "extension"
-      ? EXTENSION_LOGIC_UP
-      : FUNCTION_LOGIC_UP;
-  return {
-    up: UP,
-    down: typeLogic == "extension" ? EXTENSION_LOGIC_DOWN : LOGIC_DOWN,
-  };
+function getQueryManager(query: MigrationFunctions): queryManager {
+  let queryManager: queryManager = { up: [], down: [] };
+  queryManager.up.push(
+    `await queryRunner.query(\`${prettifyQuery(query.up.create)}\`);`
+  );
+  if ("afterCreated" in query.up) {
+    queryManager.up.push(
+      `await queryRunner.query(\`${prettifyQuery(query.up.afterCreated)}\`);`
+    );
+  }
+  queryManager.down.push(
+    `await queryRunner.query(\`${prettifyQuery(query.down)}\`);`
+  );
+  return queryManager;
 }
 
 async function createMigrationFile(
-  structureChanged: databaseStructure
+  queries: MigrationFunctions[]
 ): Promise<void> {
   try {
     const timestamp = new Date().getTime();
-    const logic = defineMigrationLogic(structureChanged.logicType);
-    const name = path.basename(structureChanged.path);
-    const fileContent = getTemplate(
-      name,
-      timestamp,
-      structureChanged.path,
-      logic
+    const queriesManager = queries.map((query: MigrationFunctions) =>
+      getQueryManager(query)
     );
-    const filename = timestamp + "-" + name + ".ts";
-    let directory = "src/migration";
-    const pathOfFile =
-      process.cwd() + "/" + (directory ? directory + "/" : "") + filename;
-    await createFile(pathOfFile, fileContent);
-    console.log(`Migration has been generated successfully.`);
-  } catch (err) {
-    console.log("Error during migration creation:");
-    console.error(err);
-    process.exit(1);
-  }
-}
-
-async function createMigrationFileForExtensions(): Promise<void> {
-  try {
-    const timestamp = new Date().getTime();
-    const name = path.basename("extensions");
-    const importRoute = `import { EXTENSIONS } from "@/utils/db_tools"`;
-    const logic = defineMigrationLogic("extension");
-    const fileContent = getTemplateForExtensions(
-      name,
-      timestamp,
-      importRoute,
-      logic
-    );
+    const up = queriesManager
+      .map((queryManager) => queryManager.up)
+      .join("\n    ");
+    const down = queriesManager
+      .map((queryManager) => queryManager.down)
+      .join("\n    ");
+    const name = args[1];
+    const fileContent = getTemplate(name, timestamp, up, down);
     const filename = timestamp + "-" + name + ".ts";
     let directory = "src/migration";
     const pathOfFile =
@@ -140,8 +103,8 @@ async function createMigrationFileForExtensions(): Promise<void> {
 function isMigrationRoute(structure: databaseStructure): boolean {
   return (
     (structure.logicType == args[0] || args[0] == "all") &&
-    (structure.path.includes(MIGRATION_ROUTES[0]) ||
-      structure.path.includes(MIGRATION_ROUTES[1]))
+    (structure.path.includes(ORM_CONFIG[1][0]) ||
+      structure.path.includes(ORM_CONFIG[1][1]))
   );
 }
 
@@ -150,12 +113,12 @@ let structuresChanged: databaseStructure[] = [];
 function getStructure(filename): databaseStructure {
   return {
     path: filename.replace(".ts", ""),
-    logicType: filename.includes(MIGRATION_ROUTES[0]) ? "function" : "trigger",
+    logicType: filename.includes(ORM_CONFIG[1][0]) ? "function" : "trigger",
   };
 }
 
 if (args[0] == "extension") {
-  createMigrationFileForExtensions();
+  createMigrationFile(CONSTRUCTED_EXTENSIONS);
 } else {
   /**
    * Gets the path of the changed files (triggers and functions).
@@ -167,9 +130,10 @@ if (args[0] == "extension") {
     if (structuresChanged.length === 0) {
       console.log("There are not changes in the structures.");
     } else {
-      for (let structure of structuresChanged) {
-        await createMigrationFile(structure);
-      }
+      const queries = structuresChanged.map(
+        (structure: databaseStructure) => require(structure.path).default
+      );
+      await createMigrationFile(queries);
     }
   });
 }

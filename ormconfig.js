@@ -33,7 +33,4 @@ const EXTENSIONS = [
       schema: "public"
    }
 ];
-module.exports = [DEFAULT_CONNECTION];
-exports.MIGRATION_ROUTES = MIGRATION_ROUTES;
-exports.EXTENSIONS = EXTENSIONS;
-exports.USERNAME = DEFAULT_CONNECTION.username;
+module.exports = [DEFAULT_CONNECTION, MIGRATION_ROUTES, EXTENSIONS];

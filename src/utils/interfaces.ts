@@ -1,26 +1,23 @@
-interface createDatabaseFunction{
+interface createStructure{
   create: string,
-  afterCreated: string
+  afterCreated?: string
 }
 
-type up = string | createDatabaseFunction;
+export interface queryManager {
+  up: string[],
+  down: string[]
+}
 
 export interface MigrationFunctions {
-  up: up;
+  up: createStructure;
   down: string;
 }
 
 export interface DatabaseFunction {
   name: string,
-  logic: string,
+  expression: string,
   options?: string,
   afterCreated: string
-}
-
-export interface Trigger {
-  name: string,
-  logic: string,
-  table: string
 }
 
 export interface Extension {
@@ -32,4 +29,9 @@ export interface Extension {
 export interface databaseStructure {
   path: string,
   logicType: string
+}
+
+export interface afterCreatedFunction {
+  func: Function,
+  params: string[]
 }

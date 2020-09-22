@@ -1,15 +1,22 @@
-import { triggerConstructor } from "@/utils/db_tools";
-import { Trigger } from "@/utils/interfaces";
+import { Trigger } from "@/utils/db_classes";
 import { TABLE_NAME } from "@/entity/import";
 
-const update_validate_import: Trigger = {
-  name: "update_validate_import",
-  logic: `
+const triggerName = "update_validate_import";
+
+class UpdateValidateImport extends Trigger {
+  constructor(name: string, expression: string, table: string) {
+    super(name, expression, table);
+  }
+}
+
+const update_validate_import = new UpdateValidateImport(
+  triggerName,
+  `
   BEFORE UPDATE
     ON public.${TABLE_NAME}
     FOR EACH ROW 
-  EXECUTE PROCEDURE update_validate_import()`,
-  table: TABLE_NAME
-};
+  EXECUTE PROCEDURE ${triggerName}();`,
+  TABLE_NAME
+);
 
-export default triggerConstructor(update_validate_import);
+export default update_validate_import.queryConstructor();

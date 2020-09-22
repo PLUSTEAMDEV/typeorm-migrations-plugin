@@ -1,15 +1,22 @@
-import { triggerConstructor } from "@/utils/db_tools";
-import { Trigger } from "@/utils/interfaces";
+import { Trigger } from "@/utils/db_classes";
 import { TABLE_NAME } from "@/entity/location";
 
-const unit_location_parent: Trigger = {
-  name: "unit_location_parent",
-  logic: `
+const triggerName = "unit_location_parent";
+
+class UnitLocationParent extends Trigger {
+  constructor(name: string, expression: string, table: string) {
+    super(name, expression, table);
+  }
+}
+
+const unit_location_parent = new UnitLocationParent(
+  triggerName,
+  `
   BEFORE INSERT
     ON public.${TABLE_NAME}
     FOR EACH ROW 
   EXECUTE PROCEDURE check_parent()`,
-  table: TABLE_NAME
-};
+  TABLE_NAME
+);
 
-export default triggerConstructor(unit_location_parent);
+export default unit_location_parent.queryConstructor();

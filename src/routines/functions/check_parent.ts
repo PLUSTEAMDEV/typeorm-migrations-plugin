@@ -1,15 +1,30 @@
-import { functionConstructor } from "@/utils/db_tools";
-import { DatabaseFunction } from "@/utils/interfaces";
-const USERNAME = require('ormconfig');
+import { Routine } from "@/utils/db_classes";
+import { grantAccessToRoutine } from "@/utils/db_tools";
+import { afterCreatedFunction } from "@/utils/interfaces";
+const ORM_CONFIG = require("ormconfig");
 
-const check_parent: DatabaseFunction = {
-  name: "check_parent",
-  logic: `function check_parent()
-    returns trigger as 
-  $BODY$ 
+const functionName = "check_parent";
+
+class CheckParent extends Routine {
+  constructor(
+    name: string,
+    expression: string,
+    afterCreated: afterCreatedFunction[]
+  ) {
+    super(name, expression, afterCreated);
+  }
+}
+
+const check_parent = new CheckParent(
+  functionName,
+  `FUNCTION public.${functionName}()
+    RETURNS trigger
+    LANGUAGE plpgsql
+  AS
+  $$
   DECLARE
-      parent_id INTEGER := 0;
-      new_value INTEGER := 0;
+    parent_id INTEGER := 0;
+    new_value INTEGER := 0;
   BEGIN
       SELECT space_unit_id
       INTO parent_id
@@ -23,16 +38,16 @@ const check_parent: DatabaseFunction = {
       THEN
           RETURN NEW;
       ELSE
-          RAISE EXCEPTION 'The parent locality does not correspond to the locality';
+          RAISE EXCEPTION 'The new location space unit does not coincide with the parent location space unit hierarchy';
       END IF;
   END;
-  $BODY$ `,
-  options: `
-    language PLPGSQL volatile
-    cost 100;`,
-  afterCreated: `
-    ALTER FUNCTION check_parent() OWNER TO ${USERNAME};
-  `
-};
+  $$;`,
+  [
+    {
+      func: grantAccessToRoutine,
+      params: [ORM_CONFIG[0].username],
+    },
+  ]
+);
 
-export default functionConstructor(check_parent);
+export default check_parent.queryConstructor();
