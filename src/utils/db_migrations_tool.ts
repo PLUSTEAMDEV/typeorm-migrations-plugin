@@ -88,11 +88,11 @@ export class ${name}${timestamp} implements MigrationInterface {
   getQueryRunner(query: MigrationFunctions): queryRunner {
     let queryRunners: queryRunner = { up: [], down: [] };
     if ("beforeCreated" in query.up) {
-      queryRunners.up.push(
-        `await queryRunner.query(\`${this.prettifyQuery(
-          query.up.beforeCreated
-        )}\`);`
-      );
+      for (let before of query.up.beforeCreated) {
+        queryRunners.up.push(
+          `await queryRunner.query(\`${this.prettifyQuery(before)}\`);`
+        );
+      }
     }
     queryRunners.up.push(
       `await queryRunner.query(\`${this.prettifyQuery(query.up.create)}\`);`
@@ -104,7 +104,14 @@ export class ${name}${timestamp} implements MigrationInterface {
         )}\`);`
       );
     }
-    queryRunners.down.push(`await queryRunner.query(\`${query.down}\`);`);
+    queryRunners.down.push(`await queryRunner.query(\`${query.down.drop}\`);`);
+    if ("afterDrop" in query.down) {
+      queryRunners.down.push(
+        `await queryRunner.query(\`${this.prettifyQuery(
+          query.down.afterDrop
+        )}\`);`
+      );
+    }
     return queryRunners;
   }
 

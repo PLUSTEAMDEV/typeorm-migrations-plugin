@@ -2,7 +2,7 @@ import { Routine } from "@/utils/db_classes";
 import {grantAccessToRoutine} from "@/utils/db_tools";
 import {DB_USERS, PUBLIC_SCHEMA} from "migrationsconfig";
 
-const update_validate_import = new Routine(
+const routine = new Routine(
   "update_validate_import",
   `FUNCTION {schema}.{name}({parameters})
     RETURNS trigger
@@ -39,4 +39,4 @@ const update_validate_import = new Routine(
   PUBLIC_SCHEMA
 );
 
-export default update_validate_import.queryConstructor();
+export default routine.queryConstructor();

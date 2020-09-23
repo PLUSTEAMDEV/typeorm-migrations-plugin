@@ -3,7 +3,7 @@ import { grantAccessToRoutine } from "@/utils/db_tools";
 import { DB_USERS, PUBLIC_SCHEMA } from "migrationsconfig";
 
 
-const check_parent = new Routine(
+const routine = new Routine(
   "check_parent",
   `FUNCTION {schema}.{name}({parameters})
     RETURNS TRIGGER
@@ -40,4 +40,4 @@ const check_parent = new Routine(
   PUBLIC_SCHEMA
 );
 
-export default check_parent.queryConstructor();
+export default routine.queryConstructor();

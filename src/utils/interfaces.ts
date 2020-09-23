@@ -1,7 +1,12 @@
 interface createStructure{
-  beforeCreated?: string,
+  beforeCreated?: string[],
   create: string,
   afterCreated?: string
+}
+
+interface dropStructure {
+  drop: string,
+  afterDrop?: string
 }
 
 export interface queryRunner {
@@ -11,7 +16,7 @@ export interface queryRunner {
 
 export interface MigrationFunctions {
   up: createStructure;
-  down: string;
+  down: dropStructure;
 }
 
 export interface DatabaseFunction {

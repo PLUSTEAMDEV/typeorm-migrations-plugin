@@ -2,7 +2,7 @@ import { Routine } from "@/utils/db_classes";
 import {grantAccessToRoutine} from "@/utils/db_tools";
 import { DB_USERS, PUBLIC_SCHEMA } from "migrationsconfig";
 
-const augrade_total = new Routine(
+const routine = new Routine(
   "augrade_total",
   `FUNCTION public.{name}({parameters}) RETURNS numeric
       LANGUAGE plpgsql
@@ -135,4 +135,4 @@ const augrade_total = new Routine(
   PUBLIC_SCHEMA
 );
 
-export default augrade_total.queryConstructor();
+export default routine.queryConstructor();

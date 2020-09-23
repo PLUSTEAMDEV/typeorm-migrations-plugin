@@ -1,5 +1,7 @@
 import { afterCreatedFunction, MigrationFunctions } from "@/utils/interfaces";
+import { MIGRATION_ROUTES } from "@root/migrationsconfig";
 import * as format from "string-format";
+import { checkFunctionBodies } from "@/utils/db_tools";
 
 export class Trigger {
   name: string;
@@ -8,7 +10,13 @@ export class Trigger {
   functionName: string;
   schema: string;
 
-  constructor(name: string, expression: string, table: string, functionName: string, schema: string) {
+  constructor(
+    name: string,
+    expression: string,
+    table: string,
+    functionName: string,
+    schema: string
+  ) {
     this.name = name;
     this.expression = format(expression, { schema, table, functionName });
     this.table = table;
@@ -16,14 +24,26 @@ export class Trigger {
     this.schema = schema;
   }
 
+  getQueryFunction(): MigrationFunctions {
+    return require(`${MIGRATION_ROUTES[0].path}/${this.functionName}.ts`)
+      .default;
+  }
+
   queryConstructor(): MigrationFunctions {
     const dropTrigger = `DROP TRIGGER IF EXISTS ${this.name} ON ${this.schema}.${this.table};`;
+    const queryFunction = this.getQueryFunction();
     return {
       up: {
-        beforeCreated: dropTrigger,
+        beforeCreated: [
+          dropTrigger,
+          queryFunction.up.create,
+          queryFunction.up.afterCreated,
+        ],
         create: `CREATE TRIGGER ${this.name} ${this.expression}`,
       },
-      down: dropTrigger,
+      down: {
+        drop: dropTrigger
+      },
     };
   }
 }
@@ -31,7 +51,9 @@ export class Trigger {
 export class Routine {
   name: string;
   expression: string;
+  beforeCreated: string;
   afterCreated: afterCreatedFunction[];
+  afterDrop: string;
   parameters: string;
   schema: string;
 
@@ -52,6 +74,7 @@ export class Routine {
   queryConstructor(): MigrationFunctions {
     return {
       up: {
+        beforeCreated: [checkFunctionBodies(false)],
         create: `CREATE OR REPLACE ${this.expression}`,
         afterCreated: this.afterCreated
           .map((option: afterCreatedFunction) =>
@@ -59,7 +82,10 @@ export class Routine {
           )
           .join("\n"),
       },
-      down: `DROP FUNCTION IF EXISTS ${this.name};`,
+      down: {
+        drop: `DROP FUNCTION IF EXISTS ${this.name};`,
+        afterDrop: checkFunctionBodies(true),
+      },
     };
   }
 }

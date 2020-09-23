@@ -28,4 +28,10 @@ export function grantAccessToRoutine(
     .join("\n");
 }
 
+export function checkFunctionBodies(
+  check: boolean
+): string {
+  return `SET check_function_bodies = ${check};";`
+}
+
 export const CONSTRUCTED_EXTENSIONS = EXTENSIONS.map(extensionConstructor);
