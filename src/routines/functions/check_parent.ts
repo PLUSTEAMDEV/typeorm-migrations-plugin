@@ -1,8 +1,6 @@
 import { Routine } from "@/utils/db_classes";
-import {checkFunctionBodies, grantAccessToRoutine} from "@/utils/db_tools";
+import { grantAccessToRoutine} from "@/utils/db_tools";
 import { DB_USERS, PUBLIC_SCHEMA } from "migrationsconfig";
-import check_date_distinc from "@/routines/functions/check_date_distinc";
-
 
 const routine = new Routine(
   "check_parent",
@@ -36,10 +34,6 @@ const routine = new Routine(
     {
       func: grantAccessToRoutine,
       params: DB_USERS,
-    },
-    {
-      func: checkFunctionBodies,
-      params: ["true"]
     }
   ],
   PUBLIC_SCHEMA

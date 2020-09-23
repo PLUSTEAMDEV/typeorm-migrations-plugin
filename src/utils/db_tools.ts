@@ -30,10 +30,5 @@ export function grantAccessToRoutine(
     .join("\n");
 }
 
-export function checkFunctionBodies(
-  check: string[]
-): string {
-  return `SET check_function_bodies = ${check[0]};`
-}
 
 export const CONSTRUCTED_EXTENSIONS = EXTENSIONS.map(extensionConstructor);

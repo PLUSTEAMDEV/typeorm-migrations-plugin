@@ -1,7 +1,6 @@
 import { afterCreatedFunction, MigrationFunctions } from "@/utils/interfaces";
 import { MIGRATION_ROUTES } from "@root/migrationsconfig";
 import * as format from "string-format";
-import { checkFunctionBodies } from "@/utils/db_tools";
 
 export class Trigger {
   name: string;
@@ -70,10 +69,15 @@ export class Routine {
     this.schema = schema;
   }
 
+  checkFunctionBodies(
+    check: boolean
+  ): string {
+    return `SET check_function_bodies = ${check};`
+  }
   queryConstructor(): MigrationFunctions {
     return {
       up: {
-        beforeCreated: [checkFunctionBodies(["false"])],
+        beforeCreated: [this.checkFunctionBodies(false)],
         create: `CREATE OR REPLACE ${this.expression}`,
         afterCreated: this.afterCreated
           .map((option: afterCreatedFunction) =>
