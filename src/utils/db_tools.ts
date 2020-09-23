@@ -12,7 +12,9 @@ function extensionConstructor(extension: Extension): MigrationFunctions {
       create: `CREATE EXTENSION IF NOT EXISTS ${extension.name} WITH SCHEMA ${extension.schema};`,
       afterCreated: `COMMENT ON EXTENSION ${extension.name} IS '${extension.comments}';`,
     },
-    down: `DROP EXTENSION ${extension.name};`,
+    down: {
+      drop: `DROP EXTENSION ${extension.name};`
+    }
   };
 }
 
@@ -29,9 +31,9 @@ export function grantAccessToRoutine(
 }
 
 export function checkFunctionBodies(
-  check: boolean
+  check: string[]
 ): string {
-  return `SET check_function_bodies = ${check};";`
+  return `SET check_function_bodies = ${check[0]};`
 }
 
 export const CONSTRUCTED_EXTENSIONS = EXTENSIONS.map(extensionConstructor);

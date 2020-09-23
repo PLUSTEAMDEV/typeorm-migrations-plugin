@@ -1,5 +1,5 @@
 import { Routine } from "@/utils/db_classes";
-import {grantAccessToRoutine} from "@/utils/db_tools";
+import { checkFunctionBodies, grantAccessToRoutine } from "@/utils/db_tools";
 import { DB_USERS, PUBLIC_SCHEMA } from "migrationsconfig";
 
 const routine = new Routine(
@@ -129,8 +129,12 @@ const routine = new Routine(
   [
     {
       func: grantAccessToRoutine,
-      params: DB_USERS
-    }
+      params: DB_USERS,
+    },
+    {
+      func: checkFunctionBodies,
+      params: ["true"],
+    },
   ],
   PUBLIC_SCHEMA
 );

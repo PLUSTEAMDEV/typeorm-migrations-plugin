@@ -53,7 +53,6 @@ export class Routine {
   expression: string;
   beforeCreated: string;
   afterCreated: afterCreatedFunction[];
-  afterDrop: string;
   parameters: string;
   schema: string;
 
@@ -74,7 +73,7 @@ export class Routine {
   queryConstructor(): MigrationFunctions {
     return {
       up: {
-        beforeCreated: [checkFunctionBodies(false)],
+        beforeCreated: [checkFunctionBodies(["false"])],
         create: `CREATE OR REPLACE ${this.expression}`,
         afterCreated: this.afterCreated
           .map((option: afterCreatedFunction) =>
@@ -83,8 +82,7 @@ export class Routine {
           .join("\n"),
       },
       down: {
-        drop: `DROP FUNCTION IF EXISTS ${this.name};`,
-        afterDrop: checkFunctionBodies(true),
+        drop: `DROP FUNCTION IF EXISTS ${this.name};`
       },
     };
   }

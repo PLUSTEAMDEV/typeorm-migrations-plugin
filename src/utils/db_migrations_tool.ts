@@ -124,7 +124,7 @@ export class ${name}${timestamp} implements MigrationInterface {
         .map((queryRunner: queryRunner) => queryRunner.up.join("\n        "))
         .join("\n        "),
       down: queryRunners
-        .map((queryRunner: queryRunner) => queryRunner.down)
+        .map((queryRunner: queryRunner) => queryRunner.down.join("\n        "))
         .join("\n        "),
     };
   }
