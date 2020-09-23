@@ -3,7 +3,8 @@ import {
   DatabaseFunction,
   Extension,
 } from "@/utils/interfaces";
-const ORM_CONFIG = require("ormconfig");
+import { EXTENSIONS } from "migrationsconfig";
+import {Routine} from "@/utils/db_classes";
 
 function extensionConstructor(extension: Extension): MigrationFunctions {
   return {
@@ -16,12 +17,15 @@ function extensionConstructor(extension: Extension): MigrationFunctions {
 }
 
 export function grantAccessToRoutine(
-  routine: DatabaseFunction,
+  routine: Routine,
   users: string[]
 ): string {
   return users
-    .map((user: string) => `ALTER FUNCTION public.${routine.name}() OWNER TO "${user}";`)
+    .map(
+      (user: string) =>
+        `ALTER FUNCTION ${routine.schema}.${routine.name}(${routine.parameters}) OWNER TO "${user}";`
+    )
     .join("\n");
 }
 
-export const CONSTRUCTED_EXTENSIONS = ORM_CONFIG[2].map(extensionConstructor);
+export const CONSTRUCTED_EXTENSIONS = EXTENSIONS.map(extensionConstructor);

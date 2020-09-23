@@ -20,17 +20,4 @@ export const DEFAULT_CONNECTION = {
    },
    extra: { max: 50 }
 };
-const MIGRATION_ROUTES = ["src/routines/functions", "triggers"];
-const EXTENSIONS = [
-   {
-      name: "postgis",
-      comments: "PostGIS geometry, geography, and raster spatial types and functions",
-      schema: "public"
-   },
-   {
-      name: "unit",
-      comments: "SI units extension",
-      schema: "public"
-   }
-];
-module.exports = [DEFAULT_CONNECTION, MIGRATION_ROUTES, EXTENSIONS];
+module.exports = [DEFAULT_CONNECTION];

@@ -1,16 +1,17 @@
 import { Trigger } from "@/utils/db_classes";
 import { TABLE_NAME } from "@/entity/import";
-
-const triggerName = "update_validate_import";
+import { PUBLIC_SCHEMA } from "migrationsconfig";
 
 const update_validate_import = new Trigger(
-  triggerName,
+  "update_validate_import",
   `
   BEFORE UPDATE
-    ON public.${TABLE_NAME}
+    ON {schema}.{table}
     FOR EACH ROW 
-  EXECUTE PROCEDURE update_validate_import();`,
-  TABLE_NAME
+  EXECUTE PROCEDURE {functionName}();`,
+  TABLE_NAME,
+  "update_validate_import",
+  PUBLIC_SCHEMA
 );
 
 export default update_validate_import.queryConstructor();

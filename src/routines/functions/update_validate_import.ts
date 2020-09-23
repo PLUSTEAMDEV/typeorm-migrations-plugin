@@ -1,13 +1,10 @@
 import { Routine } from "@/utils/db_classes";
 import {grantAccessToRoutine} from "@/utils/db_tools";
-import {afterCreatedFunction} from "@/utils/interfaces";
-const ORM_CONFIG = require('ormconfig');
-
-const functionName = "update_validate_import";
+import {DB_USERS, PUBLIC_SCHEMA} from "migrationsconfig";
 
 const update_validate_import = new Routine(
-  functionName,
-  `FUNCTION public.${functionName}()
+  "update_validate_import",
+  `FUNCTION {schema}.{name}({parameters})
     RETURNS trigger
     LANGUAGE plpgsql
   AS
@@ -32,12 +29,14 @@ const update_validate_import = new Routine(
   END ;
   $$;
   `,
+  "",
   [
     {
       func: grantAccessToRoutine,
-      params: [ORM_CONFIG[0].username]
+      params: DB_USERS
     }
-  ]
+  ],
+  PUBLIC_SCHEMA
 );
 
 export default update_validate_import.queryConstructor();

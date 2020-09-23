@@ -1,13 +1,11 @@
 import { Routine } from "@/utils/db_classes";
 import { grantAccessToRoutine } from "@/utils/db_tools";
-import { afterCreatedFunction } from "@/utils/interfaces";
-const ORM_CONFIG = require("ormconfig");
+import { DB_USERS, PUBLIC_SCHEMA } from "migrationsconfig";
 
-const functionName = "check_parent";
 
 const check_parent = new Routine(
-  functionName,
-  `FUNCTION public.${functionName}()
+  "check_parent",
+  `FUNCTION {schema}.{name}({parameters})
     RETURNS TRIGGER
     LANGUAGE plpgsql
   AS
@@ -32,12 +30,14 @@ const check_parent = new Routine(
       END IF;
   END;
   $$;`,
+  "",
   [
     {
       func: grantAccessToRoutine,
-      params: [ORM_CONFIG[0].username],
+      params: DB_USERS,
     },
-  ]
+  ],
+  PUBLIC_SCHEMA
 );
 
 export default check_parent.queryConstructor();

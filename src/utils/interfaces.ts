@@ -1,4 +1,5 @@
 interface createStructure{
+  beforeCreated?: string,
   create: string,
   afterCreated?: string
 }

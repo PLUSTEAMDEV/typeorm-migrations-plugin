@@ -1,16 +1,17 @@
 import { Trigger } from "@/utils/db_classes";
 import { TABLE_NAME } from "@/entity/location";
-
-const triggerName = "unit_location_parent";
+import { PUBLIC_SCHEMA } from "migrationsconfig";
 
 const unit_location_parent = new Trigger(
-  triggerName,
+  "unit_location_parent",
   `
   BEFORE INSERT
-    ON public.${TABLE_NAME}
+    ON {schema}.{table}
     FOR EACH ROW 
-  EXECUTE PROCEDURE check_parent()`,
-  TABLE_NAME
+  EXECUTE PROCEDURE {functionName}()`,
+  TABLE_NAME,
+  "check_parent",
+  PUBLIC_SCHEMA
 );
 
 export default unit_location_parent.queryConstructor();

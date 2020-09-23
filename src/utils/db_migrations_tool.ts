@@ -1,9 +1,10 @@
 import { format } from "@sqltools/formatter/lib/sqlFormatter";
 import * as fs from "fs";
 import * as path from "path";
-const ORM_CONFIG = require("ormconfig");
 const mkdirp = require("mkdirp");
 const cgf = require("changed-git-files");
+import { MIGRATION_ROUTES } from "migrationsconfig";
+import { CONSTRUCTED_EXTENSIONS } from "@/utils/db_tools";
 import {
   MigrationFunctions,
   databaseStructure,
@@ -11,7 +12,6 @@ import {
   modifiedFile,
   queryRunnerFunction,
 } from "@/utils/interfaces";
-import { CONSTRUCTED_EXTENSIONS } from "@/utils/db_tools";
 
 let args = process.argv.slice(2);
 
@@ -30,19 +30,24 @@ class MigrationGenerator {
       );
   }
 
-  unitedData
   isMigrationRoute(structure: databaseStructure): boolean {
     return (
-      (structure.logicType == args[0] || args[0] == "all") &&
-      (structure.path.includes(ORM_CONFIG[1][0]) ||
-        structure.path.includes(ORM_CONFIG[1][1]))
+      structure.logicType === this.option ||
+      (this.option == "all" && structure.logicType !== "")
     );
   }
 
   getStructure(filename): databaseStructure {
+    let logicType = "";
+    for (let routeObject of MIGRATION_ROUTES) {
+      if (filename.includes(routeObject.path)) {
+        logicType = routeObject.option;
+        break;
+      }
+    }
     return {
       path: filename.replace(".ts", ""),
-      logicType: filename.includes(ORM_CONFIG[1][0]) ? "function" : "trigger",
+      logicType: logicType,
     };
   }
 
@@ -82,6 +87,13 @@ export class ${name}${timestamp} implements MigrationInterface {
 
   getQueryRunner(query: MigrationFunctions): queryRunner {
     let queryRunners: queryRunner = { up: [], down: [] };
+    if ("beforeCreated" in query.up) {
+      queryRunners.up.push(
+        `await queryRunner.query(\`${this.prettifyQuery(
+          query.up.beforeCreated
+        )}\`);`
+      );
+    }
     queryRunners.up.push(
       `await queryRunner.query(\`${this.prettifyQuery(query.up.create)}\`);`
     );
@@ -92,9 +104,7 @@ export class ${name}${timestamp} implements MigrationInterface {
         )}\`);`
       );
     }
-    queryRunners.down.push(
-      `await queryRunner.query(\`${query.down}\`);`
-    );
+    queryRunners.down.push(`await queryRunner.query(\`${query.down}\`);`);
     return queryRunners;
   }
 
@@ -136,7 +146,9 @@ export class ${name}${timestamp} implements MigrationInterface {
   async getMostRecentMigrationFile(): Promise<string> {
     let dir = path.resolve("src/migration");
     let files = fs.readdirSync(dir);
-    return files[files.length-1].includes("all-migrations") ? files[files.length-1]: "";
+    return files[files.length - 1].includes("all-migrations")
+      ? files[files.length - 1]
+      : "";
   }
 
   /**
@@ -182,7 +194,7 @@ export class ${name}${timestamp} implements MigrationInterface {
         (structure: databaseStructure) => require(structure.path).default
       );
     }
-    if (this.option != "all"){
+    if (this.option != "all") {
       await this.createMigrationFile(queries);
     } else {
       await this.updateMigrationFile(queries);
