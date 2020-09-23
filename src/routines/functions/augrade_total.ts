@@ -5,17 +5,7 @@ const ORM_CONFIG = require('ormconfig');
 
 const functionName = "augrade_total";
 
-class AugradeTotal extends Routine {
-  constructor(
-    name: string,
-    expression: string,
-    afterCreated: afterCreatedFunction[]
-  ) {
-    super(name, expression, afterCreated);
-  }
-}
-
-const augrade_total = new AugradeTotal(
+const augrade_total = new Routine(
   functionName,
   `FUNCTION public.${functionName}(from_calc timestamp without time zone, to_calc timestamp without time zone,
                                      id_time_unit character varying, id_location integer, id_classification integer,

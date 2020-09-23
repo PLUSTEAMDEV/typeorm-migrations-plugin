@@ -3,13 +3,7 @@ import { TABLE_NAME } from "@/entity/location";
 
 const triggerName = "unit_location_parent";
 
-class UnitLocationParent extends Trigger {
-  constructor(name: string, expression: string, table: string) {
-    super(name, expression, table);
-  }
-}
-
-const unit_location_parent = new UnitLocationParent(
+const unit_location_parent = new Trigger(
   triggerName,
   `
   BEFORE INSERT

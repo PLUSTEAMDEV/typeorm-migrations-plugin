@@ -5,20 +5,10 @@ const ORM_CONFIG = require("ormconfig");
 
 const functionName = "check_parent";
 
-class CheckParent extends Routine {
-  constructor(
-    name: string,
-    expression: string,
-    afterCreated: afterCreatedFunction[]
-  ) {
-    super(name, expression, afterCreated);
-  }
-}
-
-const check_parent = new CheckParent(
+const check_parent = new Routine(
   functionName,
   `FUNCTION public.${functionName}()
-    RETURNS trigger
+    RETURNS TRIGGER
     LANGUAGE plpgsql
   AS
   $$

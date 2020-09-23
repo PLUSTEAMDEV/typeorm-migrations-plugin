@@ -1,6 +1,6 @@
 import { afterCreatedFunction, MigrationFunctions } from "@/utils/interfaces";
 
-export abstract class Trigger {
+export class Trigger {
   name: string;
   expression: string;
   table: string;
@@ -21,7 +21,7 @@ export abstract class Trigger {
   }
 }
 
-export abstract class Routine {
+export class Routine {
   name: string;
   expression: string;
   afterCreated: afterCreatedFunction[];

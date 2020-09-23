@@ -5,17 +5,7 @@ const ORM_CONFIG = require('ormconfig');
 
 const functionName = "update_validate_import";
 
-class UpdateValidateImport extends Routine {
-  constructor(
-    name: string,
-    expression: string,
-    afterCreated: afterCreatedFunction[]
-  ) {
-    super(name, expression, afterCreated);
-  }
-}
-
-const update_validate_import = new UpdateValidateImport(
+const update_validate_import = new Routine(
   functionName,
   `FUNCTION public.${functionName}()
     RETURNS trigger

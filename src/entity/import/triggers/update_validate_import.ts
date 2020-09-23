@@ -3,19 +3,13 @@ import { TABLE_NAME } from "@/entity/import";
 
 const triggerName = "update_validate_import";
 
-class UpdateValidateImport extends Trigger {
-  constructor(name: string, expression: string, table: string) {
-    super(name, expression, table);
-  }
-}
-
-const update_validate_import = new UpdateValidateImport(
+const update_validate_import = new Trigger(
   triggerName,
   `
   BEFORE UPDATE
     ON public.${TABLE_NAME}
     FOR EACH ROW 
-  EXECUTE PROCEDURE ${triggerName}();`,
+  EXECUTE PROCEDURE update_validate_import();`,
   TABLE_NAME
 );
 

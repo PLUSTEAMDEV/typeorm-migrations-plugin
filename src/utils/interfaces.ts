@@ -3,7 +3,7 @@ interface createStructure{
   afterCreated?: string
 }
 
-export interface queryManager {
+export interface queryRunner {
   up: string[],
   down: string[]
 }
@@ -34,4 +34,14 @@ export interface databaseStructure {
 export interface afterCreatedFunction {
   func: Function,
   params: string[]
+}
+
+export interface modifiedFile {
+  filename: string,
+  status: string
+}
+
+export interface queryRunnerFunction {
+  up: string,
+  down: string
 }
