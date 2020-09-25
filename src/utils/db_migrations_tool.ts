@@ -3,8 +3,11 @@ import * as fs from "fs";
 import * as path from "path";
 const mkdirp = require("mkdirp");
 const cgf = require("changed-git-files");
-import { MIGRATION_ROUTES } from "migrationsconfig";
-import { CONSTRUCTED_EXTENSIONS } from "@/utils/db_tools";
+import { CUSTOM_FIELDS, MIGRATION_ROUTES } from "migrationsconfig";
+import {
+  CONSTRUCTED_EXTENSIONS,
+  updateCalculatedFields,
+} from "@/utils/db_tools";
 import {
   MigrationFunctions,
   databaseStructure,
@@ -19,10 +22,17 @@ class MigrationGenerator {
   name: string;
   option: string;
   structuresChanged: databaseStructure[];
+  custom: string;
 
-  constructor(name: string, option: string, structures: modifiedFile[]) {
+  constructor(
+    name: string,
+    option: string,
+    structures: modifiedFile[],
+    custom: string
+  ) {
     this.name = name;
     this.option = option;
+    this.custom = custom;
     this.structuresChanged = structures
       .map((files: modifiedFile) => this.getStructure(files.filename))
       .filter((structure: databaseStructure) =>
@@ -89,23 +99,29 @@ export class ${name}${timestamp} implements MigrationInterface {
     let queryRunners: queryRunner = { up: [], down: [] };
     if ("beforeCreated" in query.up) {
       for (let before of query.up.beforeCreated) {
-        queryRunners.up.push(
-          `await queryRunner.query(\`${this.prettifyQuery(before)}\`);`
-        );
+        if (before) {
+          queryRunners.up.push(
+            `await queryRunner.query(\`${this.prettifyQuery(before)}\`);`
+          );
+        }
       }
     }
-    queryRunners.up.push(
-      `await queryRunner.query(\`${this.prettifyQuery(query.up.create)}\`);`
-    );
-    if ("afterCreated" in query.up) {
+    if (query.up.create) {
+      queryRunners.up.push(
+        `await queryRunner.query(\`${this.prettifyQuery(query.up.create)}\`);`
+      );
+    }
+    if ("afterCreated" in query.up && query.up.afterCreated) {
       queryRunners.up.push(
         `await queryRunner.query(\`${this.prettifyQuery(
           query.up.afterCreated
         )}\`);`
       );
     }
-    queryRunners.down.push(`await queryRunner.query(\`${query.down.drop}\`);`);
-    if ("afterDrop" in query.down) {
+    if (query.down.drop) {
+      queryRunners.down.push(`await queryRunner.query(\`${query.down.drop}\`);`);
+    }
+    if ("afterDrop" in query.down && query.down.afterDrop) {
       queryRunners.down.push(
         `await queryRunner.query(\`${this.prettifyQuery(
           query.down.afterDrop
@@ -166,6 +182,16 @@ export class ${name}${timestamp} implements MigrationInterface {
     const fileData = fs.readFileSync(`src/migration/${fileName}`).toString();
     const lines = fileData.split("\n");
     const logic = this.createUpAndDownFunctions(queries);
+    if (this.custom) {
+      const updateFieldFunctions = updateCalculatedFields(CUSTOM_FIELDS);
+      const UpdateQueryRunner = this.createUpAndDownFunctions(
+        updateFieldFunctions
+      );
+      const endUpFunction = lines.indexOf("    }");
+      lines.splice(endUpFunction, 0, "        " + UpdateQueryRunner.up);
+      const startDownFunction = lines.indexOf("    }") + 3;
+      lines.splice(startDownFunction, 0, "        " + UpdateQueryRunner.down);
+    }
     lines.splice(6, 0, "        " + logic.up);
     lines.splice(lines.length - 4, 0, "        " + logic.down);
     const unitedData = lines.join("\n");
@@ -175,7 +201,9 @@ export class ${name}${timestamp} implements MigrationInterface {
     fs.renameSync(`src/migration/${fileName}`, `src/migration/${newFileName}`);
   }
 
-  async updateMigrationFile(queries: MigrationFunctions[]): Promise<void> {
+  async createOrUpdateMigrationFile(
+    queries: MigrationFunctions[]
+  ): Promise<void> {
     try {
       const fileName = await this.getMostRecentMigrationFile();
       if (!fileName) {
@@ -204,12 +232,15 @@ export class ${name}${timestamp} implements MigrationInterface {
     if (this.option != "all") {
       await this.createMigrationFile(queries);
     } else {
-      await this.updateMigrationFile(queries);
+      await this.createOrUpdateMigrationFile(queries);
     }
   }
 }
 
 cgf(async function (err, results): Promise<void> {
-  const generator = new MigrationGenerator(args[1], args[0], results);
+  const custom = args[2] || "";
+  const generator = new MigrationGenerator(args[1], args[0], results, custom);
   await generator.generate();
+  //const st = updateCalculatedField(CUSTOM_FIELDS);
+  //console.log(st);
 });

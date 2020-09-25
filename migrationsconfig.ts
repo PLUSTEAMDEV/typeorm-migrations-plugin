@@ -14,6 +14,25 @@ export const MIGRATION_ROUTES = [
 
 export const PUBLIC_SCHEMA = "public";
 
+export const CUSTOM_FIELDS = [
+  {
+    fieldName: "custom_field",
+    table: "import_status",
+    expression: "CONCAT(status,'_','7')",
+    constraintName: "",
+    columns: "",
+    notNull: false,
+  },
+  {
+    fieldName: "name",
+    table: "import",
+    expression: "CONCAT(status,'_','7')",
+    constraintName: "order_date_unique",
+    columns: "name, id",
+    notNull: true,
+  },
+];
+
 export const EXTENSIONS = [
   {
     name: "postgis",

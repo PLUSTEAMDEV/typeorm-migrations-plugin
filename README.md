@@ -25,13 +25,13 @@ npm run generate:migrations -- delete_field_in_table
 npm run generate:migrations:all 
 ```
 
-`generate:migrations:functions` : Detects the changes in the routines/functions folder and generate 1 migration file for each function.
+`generate:migrations:functions` : Detects the changes in the routines/functions folder and generate 1 migration file.
 - Example:
 ```
 npm run generate:migrations:functions 
 ```
 
-`generate:migrations:triggers` : Detects the changes in the entity/**/triggers folders and generate 1 migration file for each trigger.
+`generate:migrations:triggers` : Detects the changes in the entity/**/triggers folders and generate 1 migration file.
 - Example:
 ```
 npm run generate:migrations:triggers 

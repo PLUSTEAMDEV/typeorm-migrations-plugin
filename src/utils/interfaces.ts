@@ -19,11 +19,13 @@ export interface MigrationFunctions {
   down: dropStructure;
 }
 
-export interface DatabaseFunction {
-  name: string,
-  expression: string,
-  options?: string,
-  afterCreated: string
+export interface customField {
+  table: string,
+  fieldName: string,
+  expression: string
+  constraintName: string,
+  columns: string,
+  notNull: boolean
 }
 
 export interface Extension {
