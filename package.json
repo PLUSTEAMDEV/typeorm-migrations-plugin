@@ -9,7 +9,9 @@
       "eslint": "^7.7.0",
       "eslint-config-prettier": "^6.11.0",
       "eslint-plugin-prettier": "^3.1.4",
-      "prettier": "^2.1.1"
+      "http-server": "^0.12.3",
+      "prettier": "^2.1.1",
+      "typedoc": "^0.19.2"
    },
    "dependencies": {
       "@sqltools/formatter": "^1.2.2",
@@ -28,11 +30,13 @@
       "create:migration:file": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:create -n",
       "generate:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -n",
       "pregenerate:migrations:all": "ts-node -r ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -n all-migrations",
-      "generate:migrations:all": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts all",
-      "generate:migrations:functions": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts function",
-      "generate:migrations:triggers": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts trigger",
-      "generate:migrations:extensions": "ts-node -r tsconfig-paths/register src/utils/db_migrations_tool.ts extension",
+      "generate:migrations:all": "ts-node -r tsconfig-paths/register src/utils/database-migrations/db_migrations_tool.ts all",
+      "generate:migrations:functions": "ts-node -r tsconfig-paths/register src/utils/database-migrations/db_migrations_tool.ts function",
+      "generate:migrations:triggers": "ts-node -r tsconfig-paths/register src/utils/database-migrations/db_migrations_tool.ts trigger",
+      "generate:migrations:extensions": "ts-node -r tsconfig-paths/register src/utils/database-migrations/db_migrations_tool.ts extension",
       "apply:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run",
-      "revert:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert"
+      "revert:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert",
+      "docs": "typedoc --options typedocs.json",
+      "postdocs": "http-server ./docs"
    }
 }

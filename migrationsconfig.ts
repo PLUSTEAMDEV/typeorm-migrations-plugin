@@ -1,6 +1,13 @@
+/**
+ * Configuration constants for the custom migration process.
+ * @packageDocumentation
+ */
 require("dotenv").config();
 const { DB_USER } = process.env;
 
+export const MIGRATIONS_PATH = "src/migration";
+
+/** Paths to the files of the database structures. */
 export const MIGRATION_ROUTES = [
   {
     path: "src/routines/functions",
@@ -12,27 +19,15 @@ export const MIGRATION_ROUTES = [
   },
 ];
 
+/** Public schema of the database. */
 export const PUBLIC_SCHEMA = "public";
 
+/** Calculated fields to be taken in account during the migration process. */
 export const CUSTOM_FIELDS = [
-  {
-    fieldName: "custom_field",
-    table: "import_status",
-    expression: "CONCAT(status,'_','7')",
-    constraintName: "",
-    columns: "",
-    notNull: false,
-  },
-  {
-    fieldName: "name",
-    table: "import",
-    expression: "CONCAT(status,'_','7')",
-    constraintName: "order_date_unique",
-    columns: "name, id",
-    notNull: true,
-  },
+
 ];
 
+/** Extension to be apply in the database. They are must be downloaded in the database already. */
 export const EXTENSIONS = [
   {
     name: "postgis",
@@ -47,4 +42,5 @@ export const EXTENSIONS = [
   },
 ];
 
+/** Database users. */
 export const DB_USERS = [DB_USER];

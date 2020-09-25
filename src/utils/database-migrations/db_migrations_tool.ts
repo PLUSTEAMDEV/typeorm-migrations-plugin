@@ -1,29 +1,49 @@
+/**
+ * Generates the custom migration process.
+ * @packageDocumentation
+ */
 import { format } from "@sqltools/formatter/lib/sqlFormatter";
 import * as fs from "fs";
 import * as path from "path";
 const mkdirp = require("mkdirp");
-const cgf = require("changed-git-files");
-import { CUSTOM_FIELDS, MIGRATION_ROUTES } from "migrationsconfig";
+const changedGitFiles = require("changed-git-files");
+import { MIGRATIONS_PATH, CUSTOM_FIELDS, MIGRATION_ROUTES } from "@root/migrationsconfig";
 import {
   CONSTRUCTED_EXTENSIONS,
   updateCalculatedFields,
-} from "@/utils/db_tools";
+} from "@/utils/database-migrations/db_tools";
 import {
   MigrationFunctions,
   databaseStructure,
   queryRunner,
   modifiedFile,
   queryRunnerFunction,
-} from "@/utils/interfaces";
+} from "@/utils/database-migrations/interfaces";
 
 let args = process.argv.slice(2);
 
+/**
+ * Generates or updates the migration file with the changes for:
+ * Triggers, Routines, Extensions and Calculated Table's fields.
+ */
 class MigrationGenerator {
+  /** Name of migration file. It is received from the command line. */
   name: string;
+  /** Option for the migration process to search for changes in structures:
+   * function
+   * trigger
+   * extension
+   */
   option: string;
+  /** File with database structures with changes. */
   structuresChanged: databaseStructure[];
+  /** Option to consider the calculated fields in the migration. */
   custom: string;
 
+  /**
+   * Constructor of the generator. In here, the structuresChanged is
+   * mapped and filtered to search for the structures with changes.
+   */
   constructor(
     name: string,
     option: string,
@@ -40,6 +60,12 @@ class MigrationGenerator {
       );
   }
 
+  /**
+   * Function to know if the structure is in a migration route.
+   * With the 'all' option it takes triggers and functions routes.
+   * @param structure File structure.
+   * @return a boolean to know if the file is in a migration path.
+   */
   isMigrationRoute(structure: databaseStructure): boolean {
     return (
       structure.logicType === this.option ||
@@ -47,6 +73,11 @@ class MigrationGenerator {
     );
   }
 
+  /**
+   * Function map the structures and gets the filename and the logic type.
+   * @param filename File name where is the structure.
+   * @return structure with the name and the logic.
+   */
   getStructure(filename): databaseStructure {
     let logicType = "";
     for (let routeObject of MIGRATION_ROUTES) {
@@ -61,6 +92,14 @@ class MigrationGenerator {
     };
   }
 
+  /**
+   * Function to know if the structure is in a migration route.
+   * With the 'all' option it takes triggers and functions routes.
+   * @param filePath Filepath to the directory.
+   * @param content Content of the file.
+   * @param override Override option to know if overrides the file.
+   * @return a promise when the file is created.
+   */
   async createFile(
     filePath: string,
     content: string,
@@ -73,11 +112,23 @@ class MigrationGenerator {
     });
   }
 
+  /**
+   * Formats the sql query with blank spaces.
+   * @param query Filepath to the directory.
+   * @return formatted query.
+   */
   prettifyQuery(query: string) {
     const formattedQuery = format(query, { indent: "    " });
     return "\n" + formattedQuery.replace(/^/gm, "            ") + "\n        ";
   }
 
+  /**
+   * Construct the template string with its content.
+   * @param name Name of the migration file.
+   * @param timestamp Timestamp when the file was created.
+   * @param logic Logic for the up and down functions.
+   * @return the template string.
+   */
   getTemplate(
     name: string,
     timestamp: number,
@@ -95,6 +146,12 @@ export class ${name}${timestamp} implements MigrationInterface {
 }`;
   }
 
+  /**
+   * Convert the migration function to the query runners syntax:
+   * `await queryRunner.query(SOME_QUERY);`.
+   * @param query Migration function object.
+   * @return An array with the queryRunners for up and down functions.
+   */
   getQueryRunner(query: MigrationFunctions): queryRunner {
     let queryRunners: queryRunner = { up: [], down: [] };
     if ("beforeCreated" in query.up) {
@@ -131,6 +188,12 @@ export class ${name}${timestamp} implements MigrationInterface {
     return queryRunners;
   }
 
+  /**
+   * First map the queries in the migrationFunctions structure to the queryRunner syntax,
+   * then join the up and down function of the queryRunners in a string to send it to the template file.
+   * @param queries Migration function array.
+   * @return The union of the queryRunners in a single string for up and down functions.
+   */
   createUpAndDownFunctions(queries: MigrationFunctions[]): queryRunnerFunction {
     const queryRunners = queries.map((query: MigrationFunctions) =>
       this.getQueryRunner(query)
@@ -144,13 +207,19 @@ export class ${name}${timestamp} implements MigrationInterface {
         .join("\n        "),
     };
   }
+
+  /**
+   * Insert the up a down logic in the template string and creates the migration files.
+   * @param queries Migration function array.
+   * @return A promise when the file is created.
+   */
   async createMigrationFile(queries: MigrationFunctions[]): Promise<void> {
     try {
       const timestamp = new Date().getTime();
       const logic = this.createUpAndDownFunctions(queries);
       const fileContent = this.getTemplate(this.name, timestamp, logic);
       const filename = timestamp + "-" + this.name + ".ts";
-      let directory = "src/migration";
+      let directory = MIGRATIONS_PATH;
       const pathOfFile =
         process.cwd() + "/" + (directory ? directory + "/" : "") + filename;
       await this.createFile(pathOfFile, fileContent);
@@ -162,12 +231,12 @@ export class ${name}${timestamp} implements MigrationInterface {
   }
 
   /**
-   * Gets the "all-migrations" file name generated by the generate:migrations:all command.
+   * Gets the "all-migrations" file generated by the generate:migrations:all command.
    * If the last file in the directory does not include "all-migrations" then returns "";
    * @return file name of the migration file generated.
    */
   async getMostRecentMigrationFile(): Promise<string> {
-    let dir = path.resolve("src/migration");
+    let dir = path.resolve(MIGRATIONS_PATH);
     let files = fs.readdirSync(dir);
     return files[files.length - 1].includes("all-migrations")
       ? files[files.length - 1]
@@ -177,12 +246,16 @@ export class ${name}${timestamp} implements MigrationInterface {
   /**
    * Update the migration file generated by TypeORM and include the changes of
    * triggers and functions in the up and down methods.
+   * If the custom option is true, then also include the queries for the calculated fields.
+   * @param fileName The file generated by TypeORM.
+   * @param queries Migration function array.
+   * @return A promise when the file is updated.
    */
-  async modifyMigrationFile(fileName: string, queries: MigrationFunctions[]) {
-    const fileData = fs.readFileSync(`src/migration/${fileName}`).toString();
+  async modifyMigrationFile(fileName: string, queries: MigrationFunctions[]): Promise<void> {
+    const fileData = fs.readFileSync(`${MIGRATIONS_PATH}/${fileName}`).toString();
     const lines = fileData.split("\n");
     const logic = this.createUpAndDownFunctions(queries);
-    if (this.custom) {
+    if (this.custom && CUSTOM_FIELDS.length) {
       const updateFieldFunctions = updateCalculatedFields(CUSTOM_FIELDS);
       const UpdateQueryRunner = this.createUpAndDownFunctions(
         updateFieldFunctions
@@ -195,12 +268,19 @@ export class ${name}${timestamp} implements MigrationInterface {
     lines.splice(6, 0, "        " + logic.up);
     lines.splice(lines.length - 4, 0, "        " + logic.down);
     const unitedData = lines.join("\n");
-    fs.writeFileSync(`src/migration/${fileName}`, unitedData);
+    fs.writeFileSync(`${MIGRATIONS_PATH}/${fileName}`, unitedData);
     const partsFileName = fileName.split("-");
     const newFileName = `${partsFileName[0]}-${this.name}.ts`;
-    fs.renameSync(`src/migration/${fileName}`, `src/migration/${newFileName}`);
+    fs.renameSync(`${MIGRATIONS_PATH}/${fileName}`, `${MIGRATIONS_PATH}/${newFileName}`);
   }
 
+  /**
+   * If TypeORM detects changes in the entities or the views, it will generate a migration file,
+   * so we get that fileName an modify its content with the changes of the structures (triggers, routines, etc)
+   * If TypeORM does not generate a file, then it calls the createMigrationFile.
+   * @param queries Migration function array.
+   * @return A promise when the file is created or updated.
+   */
   async createOrUpdateMigrationFile(
     queries: MigrationFunctions[]
   ): Promise<void> {
@@ -216,9 +296,16 @@ export class ${name}${timestamp} implements MigrationInterface {
       console.error(err);
     }
   }
+
+  /**
+   * Map the structures with changes and decide if we create migration file for the changes of the structures,
+   * or if we choose the 'all' option, then update the generated file by TypeORM.
+   * Note: If the option property is 'extension' then the databaseStructures will be extensions.
+   * @return A promise when the file is generated.
+   */
   async generate(): Promise<void> {
-    if (this.structuresChanged.length === 0) {
-      console.log("There are not changes in the structures.");
+    if (this.structuresChanged.length === 0 && !this.custom) {
+      console.log("There are not changes in the files.");
       return;
     }
     let queries;
@@ -237,10 +324,13 @@ export class ${name}${timestamp} implements MigrationInterface {
   }
 }
 
-cgf(async function (err, results): Promise<void> {
+/**
+ * Function which detects the files with changes since the last commit,
+ * creates the Migration generator object with the options from the command line
+ * and calls the generate method to start the generation of the migration file.
+ */
+changedGitFiles(async function (err, results): Promise<void> {
   const custom = args[2] || "";
   const generator = new MigrationGenerator(args[1], args[0], results, custom);
   await generator.generate();
-  //const st = updateCalculatedField(CUSTOM_FIELDS);
-  //console.log(st);
 });

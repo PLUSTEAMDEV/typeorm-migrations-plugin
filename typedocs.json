@@ -1,0 +1,12 @@
+{
+  "inputFiles": ["./src"],
+  "mode": "modules",
+  "out": "docs",
+  "exclude": [
+    "node_modules/**",
+    "src/migration/**",
+    "src/entity/**",
+    "src/routines/**",
+    "src/view/**"
+  ]
+}

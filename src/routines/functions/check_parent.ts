@@ -1,5 +1,5 @@
-import { Routine } from "@/utils/db_classes";
-import { grantAccessToRoutine} from "@/utils/db_tools";
+import { Routine } from "@/utils/database-migrations/db_classes";
+import { grantAccessToRoutine} from "@/utils/database-migrations/db_tools";
 import { DB_USERS, PUBLIC_SCHEMA } from "migrationsconfig";
 
 const routine = new Routine(
