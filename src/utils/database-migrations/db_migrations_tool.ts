@@ -22,6 +22,7 @@ import {
   queryRunner,
   modifiedFile,
   queryRunnerFunction,
+  MigrationOptionType,
 } from "@/utils/database-migrations/interfaces";
 //TODO: #CU-2943qg Migrations - Convert the custom migration system to a npm package
 let args = process.argv.slice(2);
@@ -38,8 +39,7 @@ class MigrationGenerator {
    * trigger
    * extension
    */
-  //TODO: Improve option with interface
-  option: string;
+  option: MigrationOptionType;
   /** File with database structures with changes. */
   structuresChanged: databaseStructure[];
   /** Option to consider the calculated fields in the migration. */
@@ -56,7 +56,7 @@ class MigrationGenerator {
     custom: string
   ) {
     this.name = name;
-    this.option = option;
+    this.option = option as MigrationOptionType;
     this.custom = custom;
     this.structuresChanged = structures
       .map((files: modifiedFile) => this.getStructure(files.filename))
@@ -346,7 +346,7 @@ export class ${name}${timestamp} implements MigrationInterface {
  * creates the Migration generator object with the options from the command line
  * and calls the generate method to start the generation of the migration file.
  */
-//TODO: #CU-294bdr Improve the handling of arguments
+//TODO: #CU-294bdr Migrations - Improve the handling of arguments
 changedGitFiles(async function (err, results): Promise<void> {
   const custom = args[2] || "";
   const generator = new MigrationGenerator(args[1], args[0], results, custom);

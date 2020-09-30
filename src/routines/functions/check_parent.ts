@@ -5,7 +5,7 @@ import { DB_USERS, PUBLIC_SCHEMA } from "migrationsconfig";
 //TODO: #CU-2943qg Migrations - Routines logic abstraction
 const routine = new Routine(
   "check_parent",
-  `FUNCTION {schema}.{name}({parameters})
+  `FUNCTION {schema}.{name}({formattedParameters})
     RETURNS TRIGGER
     LANGUAGE plpgsql
   AS
@@ -30,7 +30,7 @@ const routine = new Routine(
       END IF;
   END;
   $$;`,
-  "",
+  [],
   [
     {
       func: grantAccessToRoutine,

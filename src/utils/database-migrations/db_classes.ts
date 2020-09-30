@@ -2,7 +2,11 @@
  * This file keeps the classes definition for the database structures.
  * @packageDocumentation
  */
-import { afterCreatedFunction, MigrationFunctions } from "@/utils/database-migrations/interfaces";
+import {
+  afterCreatedFunction,
+  MigrationFunctions,
+  routineParameter,
+} from "@/utils/database-migrations/interfaces";
 import { MIGRATION_ROUTES } from "@root/migrationsconfig";
 import * as format from "string-format";
 
@@ -72,7 +76,7 @@ export class Trigger {
         create: `CREATE TRIGGER ${this.name} ${this.expression}`,
       },
       down: {
-        drop: dropTrigger
+        drop: dropTrigger,
       },
     };
   }
@@ -108,13 +112,18 @@ export class Routine {
   constructor(
     name: string,
     expression: string,
-    parameters: string,
+    parameters: routineParameter[],
     afterCreated: afterCreatedFunction[],
     schema: string
   ) {
     this.name = name;
-    this.expression = format(expression, { schema, name, parameters });
-    this.parameters = parameters;
+    const formattedParameters = parameters
+      .map(
+        (parameter: routineParameter) => `${parameter.name}  ${parameter.type}`
+      )
+      .join(", ");
+    this.parameters = formattedParameters;
+    this.expression = format(expression, { schema, name, formattedParameters });
     this.afterCreated = afterCreated;
     this.schema = schema;
   }
@@ -124,10 +133,8 @@ export class Routine {
    * @param check boolean to activate or deactivate the option.
    * @return The SET check_function_bodies query.
    */
-  checkFunctionBodies(
-    check: boolean
-  ): string {
-    return `SET check_function_bodies = ${check};`
+  checkFunctionBodies(check: boolean): string {
+    return `SET check_function_bodies = ${check};`;
   }
 
   /**
@@ -148,7 +155,7 @@ export class Routine {
           .join("\n"),
       },
       down: {
-        drop: `DROP FUNCTION IF EXISTS ${this.name};`
+        drop: `DROP FUNCTION IF EXISTS ${this.name};`,
       },
     };
   }

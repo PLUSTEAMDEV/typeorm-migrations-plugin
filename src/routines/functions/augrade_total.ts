@@ -1,10 +1,15 @@
 import { Routine } from "@/utils/database-migrations/db_classes";
 import { grantAccessToRoutine } from "@/utils/database-migrations/db_tools";
 import { DB_USERS, PUBLIC_SCHEMA } from "migrationsconfig";
+import {
+  CHARACTER_VARYING,
+  INTEGER,
+  TIMESTAMP_WITHOUT_TIMEZONE,
+} from "@/utils/database-migrations/constants";
 
 const routine = new Routine(
   "augrade_total",
-  `FUNCTION public.{name}({parameters}) RETURNS numeric
+  `FUNCTION {schema}.{name}({formattedParameters}) RETURNS numeric
       LANGUAGE plpgsql
   AS
   $$
@@ -124,13 +129,37 @@ const routine = new Routine(
       RETURN ROUND(augrade::NUMERIC, 2);
   END ;
   $$;`,
-  `from_calc timestamp without time zone, to_calc timestamp without time zone, 
-              id_time_unit character varying, id_location integer, id_classification integer, id_space integer`,
+  [
+    {
+      name: "from_calc",
+      type: TIMESTAMP_WITHOUT_TIMEZONE,
+    },
+    {
+      name: "to_calc",
+      type: TIMESTAMP_WITHOUT_TIMEZONE,
+    },
+    {
+      name: "id_time_unit",
+      type: CHARACTER_VARYING,
+    },
+    {
+      name: "id_location",
+      type: INTEGER,
+    },
+    {
+      name: "id_classification",
+      type: INTEGER,
+    },
+    {
+      name: "id_space",
+      type: INTEGER,
+    },
+  ],
   [
     {
       func: grantAccessToRoutine,
       params: DB_USERS,
-    }
+    },
   ],
   PUBLIC_SCHEMA
 );

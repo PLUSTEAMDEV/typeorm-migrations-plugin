@@ -110,3 +110,16 @@ export interface queryRunnerFunction {
   /** The queryRunners strings for the down function in the migration. */
   down: string;
 }
+
+/**
+ * Represents a routine parameter.
+ */
+export interface routineParameter {
+  /** Identifier of the parameter. */
+  name: string;
+  /** The Postgres type of the parameter. */
+  type: string;
+}
+
+/** Type for the different options for the generate:migrations command. */
+export type MigrationOptionType = "all" | "function" | "trigger" | "extension";

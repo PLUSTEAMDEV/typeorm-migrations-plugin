@@ -4,7 +4,7 @@ import { DB_USERS, PUBLIC_SCHEMA } from "migrationsconfig";
 
 const routine = new Routine(
   "update_validate_import",
-  `FUNCTION {schema}.{name}({parameters})
+  `FUNCTION {schema}.{name}({formattedParameters})
     RETURNS trigger
     LANGUAGE plpgsql
   AS
@@ -29,12 +29,12 @@ const routine = new Routine(
   END ;
   $$;
   `,
-  "",
+  [],
   [
     {
       func: grantAccessToRoutine,
       params: DB_USERS,
-    }
+    },
   ],
   PUBLIC_SCHEMA
 );
