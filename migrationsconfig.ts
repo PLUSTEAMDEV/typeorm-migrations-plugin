@@ -22,10 +22,9 @@ export const MIGRATION_ROUTES = [
 /** Public schema of the database. */
 export const PUBLIC_SCHEMA = "public";
 
+//TODO: #CU-294dey Improve the calculated field process
 /** Calculated fields to be taken in account during the migration process. */
-export const CUSTOM_FIELDS = [
-
-];
+export const CUSTOM_FIELDS = [];
 
 /** Extension to be apply in the database. They are must be downloaded in the database already. */
 export const EXTENSIONS = [

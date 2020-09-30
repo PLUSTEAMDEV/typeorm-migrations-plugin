@@ -7,7 +7,11 @@ import * as fs from "fs";
 import * as path from "path";
 const mkdirp = require("mkdirp");
 const changedGitFiles = require("changed-git-files");
-import { MIGRATIONS_PATH, CUSTOM_FIELDS, MIGRATION_ROUTES } from "@root/migrationsconfig";
+import {
+  MIGRATIONS_PATH,
+  CUSTOM_FIELDS,
+  MIGRATION_ROUTES,
+} from "@root/migrationsconfig";
 import {
   CONSTRUCTED_EXTENSIONS,
   updateCalculatedFields,
@@ -19,7 +23,7 @@ import {
   modifiedFile,
   queryRunnerFunction,
 } from "@/utils/database-migrations/interfaces";
-
+//TODO: #CU-2943qg Migrations - Convert the custom migration system to a npm package
 let args = process.argv.slice(2);
 
 /**
@@ -34,6 +38,7 @@ class MigrationGenerator {
    * trigger
    * extension
    */
+  //TODO: Improve option with interface
   option: string;
   /** File with database structures with changes. */
   structuresChanged: databaseStructure[];
@@ -176,7 +181,9 @@ export class ${name}${timestamp} implements MigrationInterface {
       );
     }
     if (query.down.drop) {
-      queryRunners.down.push(`await queryRunner.query(\`${query.down.drop}\`);`);
+      queryRunners.down.push(
+        `await queryRunner.query(\`${query.down.drop}\`);`
+      );
     }
     if ("afterDrop" in query.down && query.down.afterDrop) {
       queryRunners.down.push(
@@ -235,6 +242,7 @@ export class ${name}${timestamp} implements MigrationInterface {
    * If the last file in the directory does not include "all-migrations" then returns "";
    * @return file name of the migration file generated.
    */
+  //TODO: #CU-2943u4 Improve the process of the most recent migration file
   async getMostRecentMigrationFile(): Promise<string> {
     let dir = path.resolve(MIGRATIONS_PATH);
     let files = fs.readdirSync(dir);
@@ -251,8 +259,14 @@ export class ${name}${timestamp} implements MigrationInterface {
    * @param queries Migration function array.
    * @return A promise when the file is updated.
    */
-  async modifyMigrationFile(fileName: string, queries: MigrationFunctions[]): Promise<void> {
-    const fileData = fs.readFileSync(`${MIGRATIONS_PATH}/${fileName}`).toString();
+  //TODO: #CU-2949ew Research about a tool to merge files
+  async modifyMigrationFile(
+    fileName: string,
+    queries: MigrationFunctions[]
+  ): Promise<void> {
+    const fileData = fs
+      .readFileSync(`${MIGRATIONS_PATH}/${fileName}`)
+      .toString();
     const lines = fileData.split("\n");
     const logic = this.createUpAndDownFunctions(queries);
     if (this.custom && CUSTOM_FIELDS.length) {
@@ -271,7 +285,10 @@ export class ${name}${timestamp} implements MigrationInterface {
     fs.writeFileSync(`${MIGRATIONS_PATH}/${fileName}`, unitedData);
     const partsFileName = fileName.split("-");
     const newFileName = `${partsFileName[0]}-${this.name}.ts`;
-    fs.renameSync(`${MIGRATIONS_PATH}/${fileName}`, `${MIGRATIONS_PATH}/${newFileName}`);
+    fs.renameSync(
+      `${MIGRATIONS_PATH}/${fileName}`,
+      `${MIGRATIONS_PATH}/${newFileName}`
+    );
   }
 
   /**
@@ -329,6 +346,7 @@ export class ${name}${timestamp} implements MigrationInterface {
  * creates the Migration generator object with the options from the command line
  * and calls the generate method to start the generation of the migration file.
  */
+//TODO: #CU-294bdr Improve the handling of arguments
 changedGitFiles(async function (err, results): Promise<void> {
   const custom = args[2] || "";
   const generator = new MigrationGenerator(args[1], args[0], results, custom);

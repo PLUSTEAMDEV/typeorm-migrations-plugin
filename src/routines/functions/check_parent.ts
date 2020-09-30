@@ -1,7 +1,8 @@
 import { Routine } from "@/utils/database-migrations/db_classes";
-import { grantAccessToRoutine} from "@/utils/database-migrations/db_tools";
+import { grantAccessToRoutine } from "@/utils/database-migrations/db_tools";
 import { DB_USERS, PUBLIC_SCHEMA } from "migrationsconfig";
 
+//TODO: #CU-2943qg Migrations - Routines logic abstraction
 const routine = new Routine(
   "check_parent",
   `FUNCTION {schema}.{name}({parameters})
@@ -34,7 +35,7 @@ const routine = new Routine(
     {
       func: grantAccessToRoutine,
       params: DB_USERS,
-    }
+    },
   ],
   PUBLIC_SCHEMA
 );
