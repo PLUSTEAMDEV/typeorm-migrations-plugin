@@ -40,7 +40,7 @@ const expression = `FUNCTION {schema}.{name}({parameters})
           RETURN NEW;
       END IF;
   END ;
-  $$; `;
+  $$;`;
 
 const routine = new Routine({
   routineName: "check_date_distinc",
