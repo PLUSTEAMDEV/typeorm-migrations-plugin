@@ -1,10 +1,8 @@
-import { Routine } from "@/utils/database-migrations/db_classes";
-import { grantAccessToRoutine } from "@/utils/database-migrations/db_tools";
-import { DB_USERS, PUBLIC_SCHEMA } from "migrationsconfig";
+import { Routine } from "@/utils/database-migrations/Routine";
+import { grantAccessToRoutine } from "@/utils/database-migrations/db-tools";
+import { DB_USERS, DB_SCHEMA } from "migrationsconfig";
 
-const routine = new Routine(
-  "check_date_distinc",
-  `FUNCTION {schema}.{name}({formattedParameters})
+const expression = `FUNCTION {schema}.{name}({parameters})
       RETURNS trigger
       LANGUAGE plpgsql
   AS
@@ -42,15 +40,19 @@ const routine = new Routine(
           RETURN NEW;
       END IF;
   END ;
-  $$;`,
-  [],
-  [
+  $$;`;
+
+const routine = new Routine({
+  routineName: "check_date_distinc",
+  expression,
+  parameters: [],
+  afterCreated: [
     {
       func: grantAccessToRoutine,
       params: DB_USERS,
     },
   ],
-  PUBLIC_SCHEMA
-);
+  schema: DB_SCHEMA,
+});
 
 export default routine.queryConstructor();

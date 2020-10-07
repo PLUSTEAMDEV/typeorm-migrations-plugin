@@ -1,15 +1,13 @@
-import { Routine } from "@/utils/database-migrations/db_classes";
-import { grantAccessToRoutine } from "@/utils/database-migrations/db_tools";
-import { DB_USERS, PUBLIC_SCHEMA } from "migrationsconfig";
+import { Routine } from "@/utils/database-migrations/Routine";
+import { grantAccessToRoutine } from "@/utils/database-migrations/db-tools";
+import { DB_USERS, DB_SCHEMA } from "migrationsconfig";
 import {
   CHARACTER_VARYING,
   INTEGER,
   TIMESTAMP_WITHOUT_TIMEZONE,
 } from "@/utils/database-migrations/constants";
 
-const routine = new Routine(
-  "augrade_total",
-  `FUNCTION {schema}.{name}({formattedParameters}) RETURNS numeric
+const expression = `FUNCTION {schema}.{name}({parameters}) RETURNS numeric
       LANGUAGE plpgsql
   AS
   $$
@@ -128,8 +126,12 @@ const routine = new Routine(
       END IF;
       RETURN ROUND(augrade::NUMERIC, 2);
   END ;
-  $$;`,
-  [
+  $$;`;
+
+const routine = new Routine({
+  routineName: "augrade_total",
+  expression,
+  parameters: [
     {
       name: "from_calc",
       type: TIMESTAMP_WITHOUT_TIMEZONE,
@@ -155,13 +157,13 @@ const routine = new Routine(
       type: INTEGER,
     },
   ],
-  [
+  afterCreated: [
     {
       func: grantAccessToRoutine,
       params: DB_USERS,
     },
   ],
-  PUBLIC_SCHEMA
-);
+  schema: DB_SCHEMA,
+});
 
 export default routine.queryConstructor();

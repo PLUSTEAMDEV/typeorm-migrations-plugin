@@ -1,11 +1,8 @@
-import { Routine } from "@/utils/database-migrations/db_classes";
-import { grantAccessToRoutine } from "@/utils/database-migrations/db_tools";
-import { DB_USERS, PUBLIC_SCHEMA } from "migrationsconfig";
+import { Routine } from "@/utils/database-migrations/Routine";
+import { grantAccessToRoutine } from "@/utils/database-migrations/db-tools";
+import { DB_USERS, DB_SCHEMA } from "migrationsconfig";
 
-//TODO: #CU-2943qg Migrations - Routines logic abstraction
-const routine = new Routine(
-  "check_parent",
-  `FUNCTION {schema}.{name}({formattedParameters})
+const expression = `FUNCTION {schema}.{name}({parameters})
     RETURNS TRIGGER
     LANGUAGE plpgsql
   AS
@@ -29,15 +26,20 @@ const routine = new Routine(
           RAISE EXCEPTION 'The new location space unit does not coincide with the parent location space unit hierarchy';
       END IF;
   END;
-  $$;`,
-  [],
-  [
+  $$;`;
+
+//TODO: #CU-2943qg Migrations - Routines logic abstraction
+const routine = new Routine({
+  routineName: "check_parent",
+  expression,
+  parameters: [],
+  afterCreated: [
     {
       func: grantAccessToRoutine,
       params: DB_USERS,
     },
   ],
-  PUBLIC_SCHEMA
-);
+  schema: DB_SCHEMA,
+});
 
 export default routine.queryConstructor();

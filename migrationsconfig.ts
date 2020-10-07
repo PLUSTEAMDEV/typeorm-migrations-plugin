@@ -20,7 +20,7 @@ export const MIGRATION_ROUTES = [
 ];
 
 /** Public schema of the database. */
-export const PUBLIC_SCHEMA = "public";
+export const DB_SCHEMA = "public";
 
 //TODO: #CU-294dey Improve the calculated field process
 /** Calculated fields to be taken in account during the migration process. */
@@ -32,12 +32,12 @@ export const EXTENSIONS = [
     name: "postgis",
     comments:
       "PostGIS geometry, geography, and raster spatial types and functions",
-    schema: PUBLIC_SCHEMA,
+    schema: DB_SCHEMA,
   },
   {
     name: "unit",
     comments: "SI units extension",
-    schema: PUBLIC_SCHEMA,
+    schema: DB_SCHEMA,
   },
 ];
 

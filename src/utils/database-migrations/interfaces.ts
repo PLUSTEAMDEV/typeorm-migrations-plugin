@@ -121,5 +121,27 @@ export interface routineParameter {
   type: string;
 }
 
+export interface TriggerOptions {
+  triggerName: string;
+  expression: string;
+  tableName: string;
+  procedureName: string;
+  /** Schema to which the table belongs. In the Trigger,
+   * schema is optional because default is the DB_SCHEMA variable
+   */
+  schema?: string;
+}
+
+export interface RoutineOptions {
+  routineName: string;
+  expression: string;
+  parameters?: routineParameter[];
+  afterCreated: afterCreatedFunction[];
+  /** Schema to which the routine belongs. In the Routine,
+   * schema is optional because default is the DB_SCHEMA variable
+   */
+  schema?: string;
+}
+
 /** Type for the different options for the generate:migrations command. */
 export type MigrationOptionType = "all" | "function" | "trigger" | "extension";
