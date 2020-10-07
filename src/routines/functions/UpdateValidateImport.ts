@@ -31,7 +31,6 @@ const expression = `FUNCTION {schema}.{name}({parameters})
 const routine = new Routine({
   routineName: "update_validate_import",
   expression,
-  parameters: [],
   afterCreated: [
     {
       func: grantAccessToRoutine,

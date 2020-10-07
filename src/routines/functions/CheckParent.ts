@@ -32,7 +32,6 @@ const expression = `FUNCTION {schema}.{name}({parameters})
 const routine = new Routine({
   routineName: "check_parent",
   expression,
-  parameters: [],
   afterCreated: [
     {
       func: grantAccessToRoutine,

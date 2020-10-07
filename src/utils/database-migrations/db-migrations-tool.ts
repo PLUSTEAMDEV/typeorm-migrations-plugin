@@ -23,6 +23,7 @@ import {
   modifiedFile,
   queryRunnerFunction,
   MigrationOptionType,
+  GeneratorOptions,
 } from "@/utils/database-migrations/interfaces";
 //TODO: #CU-2943qg Migrations - Convert the custom migration system to a npm package
 let args = process.argv.slice(2);
@@ -49,16 +50,11 @@ class MigrationGenerator {
    * Constructor of the generator. In here, the structuresChanged is
    * mapped and filtered to search for the structures with changes.
    */
-  constructor(
-    name: string,
-    option: string,
-    structures: modifiedFile[],
-    custom: string
-  ) {
-    this.name = name;
-    this.option = option as MigrationOptionType;
-    this.custom = custom;
-    this.structuresChanged = structures
+  constructor(options: GeneratorOptions) {
+    this.name = options.name;
+    this.option = options.option;
+    this.custom = options.custom;
+    this.structuresChanged = options.modifiedFiles
       .map((files: modifiedFile) => this.getStructure(files.filename))
       .filter((structure: databaseStructure) =>
         this.isMigrationRoute(structure)
@@ -348,7 +344,11 @@ export class ${name}${timestamp} implements MigrationInterface {
  */
 //TODO: #CU-294bdr Migrations - Improve the handling of arguments
 changedGitFiles(async function (err, results): Promise<void> {
-  const custom = args[2] || "";
-  const generator = new MigrationGenerator(args[1], args[0], results, custom);
+  const generator = new MigrationGenerator({
+    name: args[1],
+    option: args[0] as MigrationOptionType,
+    modifiedFiles: results,
+    custom: args[2] || "",
+  });
   await generator.generate();
 });

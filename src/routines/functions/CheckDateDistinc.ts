@@ -45,7 +45,6 @@ const expression = `FUNCTION {schema}.{name}({parameters})
 const routine = new Routine({
   routineName: "check_date_distinc",
   expression,
-  parameters: [],
   afterCreated: [
     {
       func: grantAccessToRoutine,

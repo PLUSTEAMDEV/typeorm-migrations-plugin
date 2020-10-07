@@ -36,7 +36,8 @@ export class Routine {
    */
   constructor(options: RoutineOptions) {
     this.name = options.routineName;
-    this.parameters = options.parameters
+    const parameters = "parameters" in options ? options.parameters : [];
+    this.parameters = parameters
       .map(
         (parameter: routineParameter) => `${parameter.name}  ${parameter.type}`
       )
@@ -46,7 +47,7 @@ export class Routine {
       name: options.routineName,
       parameters: this.parameters,
     });
-    this.afterCreated = options.afterCreated;
+    this.afterCreated = "afterCreated" in options ? options.afterCreated : [];
     this.schema = "schema" in options ? options.schema : DB_SCHEMA;
   }
 

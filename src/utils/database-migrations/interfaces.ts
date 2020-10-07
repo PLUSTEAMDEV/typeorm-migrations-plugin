@@ -122,9 +122,15 @@ export interface routineParameter {
 }
 
 export interface TriggerOptions {
+  /** Name of the trigger in the database. */
   triggerName: string;
+  /** The logic for create the trigger.
+   * It is all the expression after the 'CREATE TRIGGER name'
+   */
   expression: string;
+  /** The table to which the trigger relates. */
   tableName: string;
+  /** Name of the routine that the triggers calls. */
   procedureName: string;
   /** Schema to which the table belongs. In the Trigger,
    * schema is optional because default is the DB_SCHEMA variable
@@ -133,14 +139,27 @@ export interface TriggerOptions {
 }
 
 export interface RoutineOptions {
+  /** Name of the routine in the database. */
   routineName: string;
+  /** The logic for create the routine.
+   * It is all the expression after the 'CREATE OR REPLACE'
+   */
   expression: string;
+  /** An array of the parameters for the routine and its types. */
   parameters?: routineParameter[];
-  afterCreated: afterCreatedFunction[];
+  /** Array of functions that returns queries to run after create the routine in the db. */
+  afterCreated?: afterCreatedFunction[];
   /** Schema to which the routine belongs. In the Routine,
    * schema is optional because default is the DB_SCHEMA variable
    */
   schema?: string;
+}
+
+export interface GeneratorOptions {
+  name: string;
+  option: MigrationOptionType;
+  modifiedFiles: modifiedFile[];
+  custom: string;
 }
 
 /** Type for the different options for the generate:migrations command. */

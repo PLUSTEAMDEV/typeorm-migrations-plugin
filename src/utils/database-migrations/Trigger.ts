@@ -55,7 +55,6 @@ export class Trigger {
       /(^\w|_\w)/g,
       this.clearAndUpper
     );
-    console.log(routineFileName);
     return require(`${MIGRATION_ROUTES[0].path}/${routineFileName}.ts`).default;
   }
 
