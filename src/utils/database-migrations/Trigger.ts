@@ -40,6 +40,10 @@ export class Trigger {
     this.schema = "schema" in options ? options.schema : DB_SCHEMA;
   }
 
+  clearAndUpper(text) {
+    return text.replace(/_/, "").toUpperCase();
+  }
+
   /**
    * This function import the migration functions of the routine that
    * the trigger executes.
@@ -47,8 +51,12 @@ export class Trigger {
    * @return The migration function object of the routine.
    */
   getQueryRoutine(): MigrationFunctions {
-    return require(`${MIGRATION_ROUTES[0].path}/${this.procedureName}.ts`)
-      .default;
+    const routineFileName = this.procedureName.replace(
+      /(^\w|_\w)/g,
+      this.clearAndUpper
+    );
+    console.log(routineFileName);
+    return require(`${MIGRATION_ROUTES[0].path}/${routineFileName}.ts`).default;
   }
 
   /**
