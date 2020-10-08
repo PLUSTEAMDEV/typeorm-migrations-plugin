@@ -26,9 +26,9 @@ npm run generate:migrations:all -- add_new_routine
 ```
 or
 ```
-npm run generate:migrations:all -- add_new_routine custom
+npm run generate:migrations:all -- add_new_routine --allow_custom true
 ```
-Note: With the custom argument, it considers the CUSTOM_FIELDS defined in the migrationsconfig.ts and add them to the migration file.
+Note: With the allow_custom argument, it considers the CUSTOM_FIELDS defined in the migrationsconfig.ts and add them to the migration file.
 
 `generate:migrations:functions -- name` : Detects the changes in the routines/functions folder and generate 1 migration file.
 - Example:

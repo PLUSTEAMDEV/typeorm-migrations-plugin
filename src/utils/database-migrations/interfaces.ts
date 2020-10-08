@@ -24,10 +24,10 @@ interface DropStructure {
  * Represents the set of strings with the format:
  * 'await queryRunner.query(SOME_QUERY);'.
  */
-export interface QueryRunner {
-  /** Array of query runners for the up function in the migration file. */
+export interface MigrationSqls {
+  /** Array of strings for the up function in the migration file. */
   up: string[];
-  /** Array of query runners for the down function in the migration file. */
+  /** Array of strings runners for the down function in the migration file. */
   down: string[];
 }
 
@@ -102,12 +102,12 @@ export interface ModifiedFile {
 }
 
 /**
- * Represents the union of the queryRunners in a single string.
+ * Represents the union of the MigrationSqls in a single string.
  */
-export interface QueryRunnerFunction {
-  /** The queryRunners strings for the up function in the migration. */
+export interface MigrationFileContent {
+  /** The content for the up function in the migration. */
   up: string;
-  /** The queryRunners strings for the down function in the migration. */
+  /** The content for the down function in the migration. */
   down: string;
 }
 
@@ -170,7 +170,7 @@ export interface GeneratorOptions {
   name: string;
   option: MigrationOptionType;
   modifiedFiles: ModifiedFile[];
-  custom: string;
+  custom: boolean;
 }
 
 /** Type for the different options for the generate:migrations command. */

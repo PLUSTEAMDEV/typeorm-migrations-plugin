@@ -4,6 +4,7 @@
    "description": "Awesome project developed with TypeORM.",
    "devDependencies": {
       "@types/node": "^8.0.29",
+      "@types/yargs": "^15.0.7",
       "@typescript-eslint/eslint-plugin": "^3.10.1",
       "@typescript-eslint/parser": "^3.10.1",
       "eslint": "^7.7.0",
@@ -23,17 +24,18 @@
       "ts-node": "^9.0.0",
       "tsconfig-paths": "^3.9.0",
       "typeorm": "0.2.25",
-      "typescript": "^4.0.2"
+      "typescript": "^4.0.2",
+      "yargs": "^16.0.3"
    },
    "scripts": {
       "services:db": "docker-compose -f docker-compose.yaml up -d test-db",
       "create:migration:file": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:create -n",
       "generate:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -n",
       "pregenerate:migrations:all": "ts-node -r ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -n all-migrations",
-      "generate:migrations:all": "ts-node -r tsconfig-paths/register src/utils/database-migrations/db-migrations-tool.ts all",
-      "generate:migrations:functions": "ts-node -r tsconfig-paths/register src/utils/database-migrations/db-migrations-tool.ts function",
-      "generate:migrations:triggers": "ts-node -r tsconfig-paths/register src/utils/database-migrations/db-migrations-tool.ts trigger",
-      "generate:migrations:extensions": "ts-node -r tsconfig-paths/register src/utils/database-migrations/db-migrations-tool.ts extension",
+      "generate:migrations:all": "ts-node -r tsconfig-paths/register src/cli migration:generate --db_structure all --file_name",
+      "generate:migrations:functions": "ts-node -r tsconfig-paths/register src/cli migration:generate --db_structure function --file_name",
+      "generate:migrations:triggers": "ts-node -r tsconfig-paths/register src/cli migration:generate --db_structure trigger --file_name",
+      "generate:migrations:extensions": "ts-node -r tsconfig-paths/register src/cli migration:generate --db_structure extension --file_name",
       "apply:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run",
       "revert:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert",
       "docs": "typedoc --options typedocs.json",

@@ -1,12 +1,7 @@
-/**
- * Generates the custom migration process.
- * @packageDocumentation
- */
 import { format } from "@sqltools/formatter/lib/sqlFormatter";
 import * as fs from "fs";
 import * as path from "path";
 const mkdirp = require("mkdirp");
-const changedGitFiles = require("changed-git-files");
 import {
   MIGRATIONS_PATH,
   CUSTOM_FIELDS,
@@ -19,20 +14,18 @@ import {
 import {
   MigrationFunctions,
   DatabaseStructure,
-  QueryRunner,
+  MigrationSqls,
   ModifiedFile,
-  QueryRunnerFunction,
+  MigrationFileContent,
   MigrationOptionType,
   GeneratorOptions,
 } from "@/utils/database-migrations/interfaces";
-//TODO: #CU-2943qg Migrations - Convert the custom migration system to a npm package
-let args = process.argv.slice(2);
 
 /**
  * Generates or updates the migration file with the changes for:
  * Triggers, Routines, Extensions and Calculated Table's fields.
  */
-class MigrationGenerator {
+export class MigrationGenerator {
   /** Name of migration file. It is received from the command line. */
   name: string;
   /** Option for the migration process to search for changes in structures:
@@ -44,7 +37,7 @@ class MigrationGenerator {
   /** File with database structures with changes. */
   structuresChanged: DatabaseStructure[];
   /** Option to consider the calculated fields in the migration. */
-  custom: string;
+  custom: boolean;
 
   /**
    * Constructor of the generator. In here, the structuresChanged is
@@ -127,22 +120,22 @@ class MigrationGenerator {
    * Construct the template string with its content.
    * @param name Name of the migration file.
    * @param timestamp Timestamp when the file was created.
-   * @param logic Logic for the up and down functions.
+   * @param content Logic for the up and down functions.
    * @return the template string.
    */
   getTemplate(
     name: string,
     timestamp: number,
-    logic: QueryRunnerFunction
+    content: MigrationFileContent
   ): string {
     return `import {MigrationInterface, QueryRunner} from "typeorm";
 export class ${name}${timestamp} implements MigrationInterface {
     name = '${name}${timestamp}'
     public async up(queryRunner: QueryRunner): Promise<void> {
-        ${logic.up}
+        ${content.up}
     }
     public async down(queryRunner: QueryRunner): Promise<void> {
-        ${logic.down}
+        ${content.down}
     }
 }`;
   }
@@ -153,8 +146,8 @@ export class ${name}${timestamp} implements MigrationInterface {
    * @param query Migration function object.
    * @return An array with the queryRunners for up and down functions.
    */
-  getQueryRunner(query: MigrationFunctions): QueryRunner {
-    let queryRunners: QueryRunner = { up: [], down: [] };
+  getQueryRunner(query: MigrationFunctions): MigrationSqls {
+    let queryRunners: MigrationSqls = { up: [], down: [] };
     if ("beforeCreated" in query.up) {
       for (let before of query.up.beforeCreated) {
         if (before) {
@@ -197,30 +190,34 @@ export class ${name}${timestamp} implements MigrationInterface {
    * @param queries Migration function array.
    * @return The union of the queryRunners in a single string for up and down functions.
    */
-  createUpAndDownFunctions(queries: MigrationFunctions[]): QueryRunnerFunction {
+  createUpAndDownFunctions(
+    queries: MigrationFunctions[]
+  ): MigrationFileContent {
     const queryRunners = queries.map((query: MigrationFunctions) =>
       this.getQueryRunner(query)
     );
     return {
       up: queryRunners
-        .map((queryRunner: QueryRunner) => queryRunner.up.join("\n        "))
+        .map((queryRunner: MigrationSqls) => queryRunner.up.join("\n        "))
         .join("\n        "),
       down: queryRunners
-        .map((queryRunner: QueryRunner) => queryRunner.down.join("\n        "))
+        .map((queryRunner: MigrationSqls) =>
+          queryRunner.down.join("\n        ")
+        )
         .join("\n        "),
     };
   }
 
   /**
-   * Insert the up a down logic in the template string and creates the migration files.
+   * Insert the up a down content in the template string and creates the migration files.
    * @param queries Migration function array.
    * @return A promise when the file is created.
    */
   async createMigrationFile(queries: MigrationFunctions[]): Promise<void> {
     try {
       const timestamp = new Date().getTime();
-      const logic = this.createUpAndDownFunctions(queries);
-      const fileContent = this.getTemplate(this.name, timestamp, logic);
+      const content = this.createUpAndDownFunctions(queries);
+      const fileContent = this.getTemplate(this.name, timestamp, content);
       const filename = timestamp + "-" + this.name + ".ts";
       let directory = MIGRATIONS_PATH;
       const pathOfFile =
@@ -264,7 +261,7 @@ export class ${name}${timestamp} implements MigrationInterface {
       .readFileSync(`${MIGRATIONS_PATH}/${fileName}`)
       .toString();
     const lines = fileData.split("\n");
-    const logic = this.createUpAndDownFunctions(queries);
+    const content = this.createUpAndDownFunctions(queries);
     if (this.custom && CUSTOM_FIELDS.length) {
       const updateFieldFunctions = updateCalculatedFields(CUSTOM_FIELDS);
       const UpdateQueryRunner = this.createUpAndDownFunctions(
@@ -275,8 +272,8 @@ export class ${name}${timestamp} implements MigrationInterface {
       const startDownFunction = lines.indexOf("    }") + 3;
       lines.splice(startDownFunction, 0, "        " + UpdateQueryRunner.down);
     }
-    lines.splice(6, 0, "        " + logic.up);
-    lines.splice(lines.length - 4, 0, "        " + logic.down);
+    lines.splice(6, 0, "        " + content.up);
+    lines.splice(lines.length - 4, 0, "        " + content.down);
     const unitedData = lines.join("\n");
     fs.writeFileSync(`${MIGRATIONS_PATH}/${fileName}`, unitedData);
     const partsFileName = fileName.split("-");
@@ -348,19 +345,3 @@ export class ${name}${timestamp} implements MigrationInterface {
     }
   }
 }
-
-/**
- * Function which detects the files with changes since the last commit,
- * creates the Migration generator object with the options from the command line
- * and calls the generate method to start the generation of the migration file.
- */
-//TODO: #CU-294bdr Migrations - Improve the handling of arguments
-changedGitFiles(async function (err, results): Promise<void> {
-  const generator = new MigrationGenerator({
-    name: args[1],
-    option: args[0] as MigrationOptionType,
-    modifiedFiles: results,
-    custom: args[2] || "",
-  });
-  await generator.generate();
-});
