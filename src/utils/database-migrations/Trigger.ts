@@ -2,8 +2,7 @@ import {
   MigrationFunctions,
   TriggerOptions,
 } from "@/utils/database-migrations/interfaces";
-import { MIGRATION_ROUTES, DB_SCHEMA } from "@root/migrationsconfig";
-import * as format from "string-format";
+import { MIGRATION_ROUTES, DB_SCHEMA } from "migrationsconfig";
 
 /**
  * Class Trigger
@@ -19,7 +18,7 @@ export class Trigger {
   /** The table to which the trigger relates. */
   tableName: string;
   /** Name of the routine that the triggers calls. */
-  procedureName: string;
+  functionName: string;
   /** Schema to which the table belongs.
    * in the constructor options is optional, default is the DB_SCHEMA variable */
   schema: string;
@@ -30,14 +29,14 @@ export class Trigger {
    */
   constructor(options: TriggerOptions) {
     this.name = options.triggerName;
-    this.expression = format(options.expression, {
-      schema: options.schema,
-      table: options.tableName,
-      procedure: options.procedureName,
-    });
     this.tableName = options.tableName;
-    this.procedureName = options.procedureName;
+    this.functionName = options.functionName;
     this.schema = "schema" in options ? options.schema : DB_SCHEMA;
+    this.expression = options.expression({
+      schema: this.schema,
+      tableName: this.tableName,
+      functionName: this.functionName,
+    });
   }
 
   clearAndUpper(text) {
@@ -51,11 +50,13 @@ export class Trigger {
    * @return The migration function object of the routine.
    */
   getQueryRoutine(): MigrationFunctions {
-    const routineFileName = this.procedureName.replace(
+    const routineFileName = this.functionName.replace(
       /(^\w|_\w)/g,
       this.clearAndUpper
     );
-    return require(`${MIGRATION_ROUTES[0].path}/${routineFileName}.ts`).default;
+    const importedRoutine = require(`${MIGRATION_ROUTES[0].path}/${routineFileName}.ts`)
+      .default;
+    return importedRoutine.queryConstructor();
   }
 
   /**

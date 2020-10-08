@@ -1,7 +1,7 @@
 /**
  * Represents the up property of a migration function.
  */
-interface createStructure {
+interface CreateStructure {
   /** Array of queries to execute before create the structure in the database. */
   beforeCreated?: string[];
   /** Query to create the structure in the database. */
@@ -13,7 +13,7 @@ interface createStructure {
 /**
  * Represents the down property of a migration function.
  */
-interface dropStructure {
+interface DropStructure {
   /** Query to drop the structure of the database. */
   drop: string;
   /** Query to execute after dropped the structure of the database. */
@@ -24,7 +24,7 @@ interface dropStructure {
  * Represents the set of strings with the format:
  * 'await queryRunner.query(SOME_QUERY);'.
  */
-export interface queryRunner {
+export interface QueryRunner {
   /** Array of query runners for the up function in the migration file. */
   up: string[];
   /** Array of query runners for the down function in the migration file. */
@@ -36,15 +36,15 @@ export interface queryRunner {
  */
 export interface MigrationFunctions {
   /** The up object with the queries steps to created the structure. */
-  up: createStructure;
+  up: CreateStructure;
   /** The down object with the queries steps to drop the structure. */
-  down: dropStructure;
+  down: DropStructure;
 }
 
 /**
  * Represents a calculated field and its properties.
  */
-export interface customField {
+export interface CustomField {
   /** The table of the field. */
   table: string;
   /** Name of the field. */
@@ -62,7 +62,7 @@ export interface customField {
 /**
  * Represents a databases extension.
  */
-export interface Extension {
+export interface DatabaseExtension {
   /** Name of the extension. */
   name: string;
   /** Comments for the extension. */
@@ -74,7 +74,7 @@ export interface Extension {
 /**
  * Represents a database structure file.
  */
-export interface databaseStructure {
+export interface DatabaseStructure {
   /** File path of the database structure. */
   path: string;
   /** Type of logic to be applied (trigger, function). */
@@ -84,7 +84,7 @@ export interface databaseStructure {
 /**
  * Represents a function to be applied in a Routine.
  */
-export interface afterCreatedFunction {
+export interface AfterCreatedFunction {
   /** Function to call in the afterCreated field of Routine. */
   func: Function;
   /** Parameters of the function. */
@@ -94,7 +94,7 @@ export interface afterCreatedFunction {
 /**
  * Represents a modified file in the project returned from the git library.
  */
-export interface modifiedFile {
+export interface ModifiedFile {
   /** Name of the file. */
   filename: string;
   /** Status of the file. (modified, added) */
@@ -104,7 +104,7 @@ export interface modifiedFile {
 /**
  * Represents the union of the queryRunners in a single string.
  */
-export interface queryRunnerFunction {
+export interface QueryRunnerFunction {
   /** The queryRunners strings for the up function in the migration. */
   up: string;
   /** The queryRunners strings for the down function in the migration. */
@@ -114,51 +114,62 @@ export interface queryRunnerFunction {
 /**
  * Represents a routine parameter.
  */
-export interface routineParameter {
+export interface RoutineParameter {
   /** Identifier of the parameter. */
   name: string;
   /** The Postgres type of the parameter. */
   type: string;
 }
 
-export interface TriggerOptions {
-  /** Name of the trigger in the database. */
-  triggerName: string;
-  /** The logic for create the trigger.
-   * It is all the expression after the 'CREATE TRIGGER name'
-   */
-  expression: string;
+export interface BaseTriggerOptions {
   /** The table to which the trigger relates. */
   tableName: string;
   /** Name of the routine that the triggers calls. */
-  procedureName: string;
+  functionName: string;
   /** Schema to which the table belongs. In the Trigger,
    * schema is optional because default is the DB_SCHEMA variable
    */
   schema?: string;
 }
 
-export interface RoutineOptions {
+export interface TriggerOptions extends BaseTriggerOptions {
+  /** Name of the trigger in the database. */
+  triggerName: string;
+  /** The logic for create the trigger.
+   * It is all the expression after the 'CREATE TRIGGER name'
+   */
+  expression: (options: BaseTriggerOptions) => string;
+}
+
+export interface BaseRoutineOptions {
   /** Name of the routine in the database. */
   routineName: string;
-  /** The logic for create the routine.
-   * It is all the expression after the 'CREATE OR REPLACE'
-   */
-  expression: string;
   /** An array of the parameters for the routine and its types. */
-  parameters?: routineParameter[];
-  /** Array of functions that returns queries to run after create the routine in the db. */
-  afterCreated?: afterCreatedFunction[];
+  parameters: string;
   /** Schema to which the routine belongs. In the Routine,
    * schema is optional because default is the DB_SCHEMA variable
    */
   schema?: string;
 }
+type BaseRoutineOptionsWithoutParameters = Omit<
+  BaseRoutineOptions,
+  "parameters"
+>;
+
+export interface RoutineOptions extends BaseRoutineOptionsWithoutParameters {
+  /** The logic for create the routine.
+   * It is all the expression after the 'CREATE OR REPLACE'
+   */
+  expression: (options: BaseRoutineOptions) => string;
+  /** Array of functions that returns queries to run after create the routine in the db. */
+  afterCreated?: AfterCreatedFunction[];
+  parameters?: RoutineParameter[];
+}
 
 export interface GeneratorOptions {
   name: string;
   option: MigrationOptionType;
-  modifiedFiles: modifiedFile[];
+  modifiedFiles: ModifiedFile[];
   custom: string;
 }
 

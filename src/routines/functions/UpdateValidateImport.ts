@@ -2,7 +2,11 @@ import { Routine } from "@/utils/database-migrations/Routine";
 import { grantAccessToRoutine } from "@/utils/database-migrations/db-tools";
 import { DB_USERS, DB_SCHEMA } from "migrationsconfig";
 
-const expression = `FUNCTION {schema}.{name}({parameters})
+const expression = ({
+  schema,
+  routineName,
+  parameters,
+}): string => `FUNCTION ${schema}.${routineName}(${parameters})
     RETURNS trigger
     LANGUAGE plpgsql
   AS
@@ -28,7 +32,7 @@ const expression = `FUNCTION {schema}.{name}({parameters})
   $$;
   `;
 
-const routine = new Routine({
+export default new Routine({
   routineName: "update_validate_import",
   expression,
   afterCreated: [
@@ -39,5 +43,3 @@ const routine = new Routine({
   ],
   schema: DB_SCHEMA,
 });
-
-export default routine.queryConstructor();

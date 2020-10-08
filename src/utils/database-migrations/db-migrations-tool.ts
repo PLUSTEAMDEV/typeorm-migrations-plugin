@@ -11,17 +11,17 @@ import {
   MIGRATIONS_PATH,
   CUSTOM_FIELDS,
   MIGRATION_ROUTES,
-} from "@root/migrationsconfig";
+} from "migrationsconfig";
 import {
   CONSTRUCTED_EXTENSIONS,
   updateCalculatedFields,
 } from "@/utils/database-migrations/db-tools";
 import {
   MigrationFunctions,
-  databaseStructure,
-  queryRunner,
-  modifiedFile,
-  queryRunnerFunction,
+  DatabaseStructure,
+  QueryRunner,
+  ModifiedFile,
+  QueryRunnerFunction,
   MigrationOptionType,
   GeneratorOptions,
 } from "@/utils/database-migrations/interfaces";
@@ -42,7 +42,7 @@ class MigrationGenerator {
    */
   option: MigrationOptionType;
   /** File with database structures with changes. */
-  structuresChanged: databaseStructure[];
+  structuresChanged: DatabaseStructure[];
   /** Option to consider the calculated fields in the migration. */
   custom: string;
 
@@ -55,8 +55,8 @@ class MigrationGenerator {
     this.option = options.option;
     this.custom = options.custom;
     this.structuresChanged = options.modifiedFiles
-      .map((files: modifiedFile) => this.getStructure(files.filename))
-      .filter((structure: databaseStructure) =>
+      .map((files: ModifiedFile) => this.getStructure(files.filename))
+      .filter((structure: DatabaseStructure) =>
         this.isMigrationRoute(structure)
       );
   }
@@ -67,7 +67,7 @@ class MigrationGenerator {
    * @param structure File structure.
    * @return a boolean to know if the file is in a migration path.
    */
-  isMigrationRoute(structure: databaseStructure): boolean {
+  isMigrationRoute(structure: DatabaseStructure): boolean {
     return (
       structure.logicType === this.option ||
       (this.option == "all" && structure.logicType !== "")
@@ -79,7 +79,7 @@ class MigrationGenerator {
    * @param filename File name where is the structure.
    * @return structure with the name and the logic.
    */
-  getStructure(filename): databaseStructure {
+  getStructure(filename): DatabaseStructure {
     let logicType = "";
     for (let routeObject of MIGRATION_ROUTES) {
       if (filename.includes(routeObject.path)) {
@@ -133,7 +133,7 @@ class MigrationGenerator {
   getTemplate(
     name: string,
     timestamp: number,
-    logic: queryRunnerFunction
+    logic: QueryRunnerFunction
   ): string {
     return `import {MigrationInterface, QueryRunner} from "typeorm";
 export class ${name}${timestamp} implements MigrationInterface {
@@ -153,8 +153,8 @@ export class ${name}${timestamp} implements MigrationInterface {
    * @param query Migration function object.
    * @return An array with the queryRunners for up and down functions.
    */
-  getQueryRunner(query: MigrationFunctions): queryRunner {
-    let queryRunners: queryRunner = { up: [], down: [] };
+  getQueryRunner(query: MigrationFunctions): QueryRunner {
+    let queryRunners: QueryRunner = { up: [], down: [] };
     if ("beforeCreated" in query.up) {
       for (let before of query.up.beforeCreated) {
         if (before) {
@@ -197,16 +197,16 @@ export class ${name}${timestamp} implements MigrationInterface {
    * @param queries Migration function array.
    * @return The union of the queryRunners in a single string for up and down functions.
    */
-  createUpAndDownFunctions(queries: MigrationFunctions[]): queryRunnerFunction {
+  createUpAndDownFunctions(queries: MigrationFunctions[]): QueryRunnerFunction {
     const queryRunners = queries.map((query: MigrationFunctions) =>
       this.getQueryRunner(query)
     );
     return {
       up: queryRunners
-        .map((queryRunner: queryRunner) => queryRunner.up.join("\n        "))
+        .map((queryRunner: QueryRunner) => queryRunner.up.join("\n        "))
         .join("\n        "),
       down: queryRunners
-        .map((queryRunner: queryRunner) => queryRunner.down.join("\n        "))
+        .map((queryRunner: QueryRunner) => queryRunner.down.join("\n        "))
         .join("\n        "),
     };
   }
@@ -311,6 +311,18 @@ export class ${name}${timestamp} implements MigrationInterface {
   }
 
   /**
+   * Import the structure object (Trigger, Routine..) and get the query constructor of each one.
+   * @param structure The object with the path to the structure.
+   * @return The migrations functions of the imported object.
+   */
+  getMigrationFunctionsFromPath(
+    structure: DatabaseStructure
+  ): MigrationFunctions {
+    const importedStructure = require(structure.path).default;
+    return importedStructure.queryConstructor();
+  }
+
+  /**
    * Map the structures with changes and decide if we create migration file for the changes of the structures,
    * or if we choose the 'all' option, then update the generated file by TypeORM.
    * Note: If the option property is 'extension' then the databaseStructures will be extensions.
@@ -325,8 +337,8 @@ export class ${name}${timestamp} implements MigrationInterface {
     if (this.option == "extension") {
       queries = CONSTRUCTED_EXTENSIONS;
     } else {
-      queries = this.structuresChanged.map(
-        (structure: databaseStructure) => require(structure.path).default
+      queries = this.structuresChanged.map((structure: DatabaseStructure) =>
+        this.getMigrationFunctionsFromPath(structure)
       );
     }
     if (this.option != "all") {

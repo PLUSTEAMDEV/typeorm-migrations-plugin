@@ -2,18 +2,16 @@ import { Trigger } from "@/utils/database-migrations/Trigger";
 import { TABLE_NAME } from "@/entity/Import";
 import { DB_SCHEMA } from "migrationsconfig";
 
-const expression = `
+const expression = ({ schema, tableName, functionName }): string => `
   BEFORE UPDATE
-    ON {schema}.{table}
+    ON ${schema}.${tableName}
     FOR EACH ROW 
-  EXECUTE PROCEDURE {procedure}();`;
+  EXECUTE PROCEDURE ${functionName}();`;
 
-const trigger = new Trigger({
+export default new Trigger({
   triggerName: "update_validate_import",
   expression,
   tableName: TABLE_NAME,
-  procedureName: "update_validate_import",
+  functionName: "update_validate_import",
   schema: DB_SCHEMA,
 });
-
-export default trigger.queryConstructor();

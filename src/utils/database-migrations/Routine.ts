@@ -1,11 +1,10 @@
 import {
-  afterCreatedFunction,
+  AfterCreatedFunction,
   MigrationFunctions,
   RoutineOptions,
-  routineParameter,
+  RoutineParameter,
 } from "@/utils/database-migrations/interfaces";
-import { DB_SCHEMA } from "@root/migrationsconfig";
-import * as format from "string-format";
+import { DB_SCHEMA } from "migrationsconfig";
 
 /**
  * Class Routine
@@ -21,7 +20,7 @@ export class Routine {
   /** Array of queries strings to run before create the routine. */
   beforeCreated: string;
   /** Array of functions that returns queries to run after create the routine in the db. */
-  afterCreated: afterCreatedFunction[];
+  afterCreated: AfterCreatedFunction[];
   /** Parameters for the routine
    * Examples: ""
    *           "id_classification integer, id_space integer"
@@ -39,16 +38,16 @@ export class Routine {
     const parameters = "parameters" in options ? options.parameters : [];
     this.parameters = parameters
       .map(
-        (parameter: routineParameter) => `${parameter.name}  ${parameter.type}`
+        (parameter: RoutineParameter) => `${parameter.name}  ${parameter.type}`
       )
       .join(", ");
-    this.expression = format(options.expression, {
-      schema: options.schema,
-      name: options.routineName,
-      parameters: this.parameters,
-    });
     this.afterCreated = "afterCreated" in options ? options.afterCreated : [];
     this.schema = "schema" in options ? options.schema : DB_SCHEMA;
+    this.expression = options.expression({
+      schema: this.schema,
+      routineName: this.name,
+      parameters: this.parameters,
+    });
   }
 
   /**
@@ -72,7 +71,7 @@ export class Routine {
         beforeCreated: [this.checkFunctionBodies(false)],
         create: `CREATE OR REPLACE ${this.expression}`,
         afterCreated: this.afterCreated
-          .map((option: afterCreatedFunction) =>
+          .map((option: AfterCreatedFunction) =>
             option.func(this, option.params)
           )
           .join("\n"),

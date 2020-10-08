@@ -3,11 +3,11 @@
  * @packageDocumentation
  */
 import {
-  customField,
-  Extension,
+  CustomField,
+  DatabaseExtension,
   MigrationFunctions,
 } from "@/utils/database-migrations/interfaces";
-import { EXTENSIONS } from "@root/migrationsconfig";
+import { EXTENSIONS } from "migrationsconfig";
 import { Routine } from "@/utils/database-migrations/Routine";
 
 /**
@@ -15,7 +15,9 @@ import { Routine } from "@/utils/database-migrations/Routine";
  * @param extension Extension object.
  * @return The migration function object of the extension.
  */
-function extensionConstructor(extension: Extension): MigrationFunctions {
+function extensionConstructor(
+  extension: DatabaseExtension
+): MigrationFunctions {
   return {
     up: {
       create: `CREATE EXTENSION IF NOT EXISTS ${extension.name} WITH SCHEMA ${extension.schema};`,
@@ -54,7 +56,7 @@ export function grantAccessToRoutine(
  * @return The migration function object with the queries joined in an string.
  */
 function getMigrationFunctionsForCustomField(
-  field: customField
+  field: CustomField
 ): MigrationFunctions {
   let queriesUp: string[] = [];
   let queriesDown: string[] = [];
@@ -93,9 +95,9 @@ function getMigrationFunctionsForCustomField(
  * @return The migration functions objects with the queries joined in an string.
  */
 export function updateCalculatedFields(
-  fields: customField[]
+  fields: CustomField[]
 ): MigrationFunctions[] {
-  return fields.map((field: customField) =>
+  return fields.map((field: CustomField) =>
     getMigrationFunctionsForCustomField(field)
   );
 }

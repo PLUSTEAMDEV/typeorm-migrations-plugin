@@ -2,7 +2,11 @@ import { Routine } from "@/utils/database-migrations/Routine";
 import { grantAccessToRoutine } from "@/utils/database-migrations/db-tools";
 import { DB_USERS, DB_SCHEMA } from "migrationsconfig";
 
-const expression = `FUNCTION {schema}.{name}({parameters})
+const expression = ({
+  schema,
+  routineName,
+  parameters,
+}): string => `FUNCTION ${schema}.${routineName}(${parameters})
     RETURNS TRIGGER
     LANGUAGE plpgsql
   AS
@@ -29,7 +33,7 @@ const expression = `FUNCTION {schema}.{name}({parameters})
   $$;`;
 
 //TODO: #CU-2943qg Migrations - Routines logic abstraction
-const routine = new Routine({
+export default new Routine({
   routineName: "check_parent",
   expression,
   afterCreated: [
@@ -40,5 +44,3 @@ const routine = new Routine({
   ],
   schema: DB_SCHEMA,
 });
-
-export default routine.queryConstructor();

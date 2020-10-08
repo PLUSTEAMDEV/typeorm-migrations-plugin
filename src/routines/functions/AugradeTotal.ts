@@ -7,7 +7,11 @@ import {
   TIMESTAMP_WITHOUT_TIMEZONE,
 } from "@/utils/database-migrations/constants";
 
-const expression = `FUNCTION {schema}.{name}({parameters}) RETURNS numeric
+const expression = ({
+  schema,
+  routineName,
+  parameters,
+}): string => `FUNCTION ${schema}.${routineName}(${parameters}) RETURNS numeric
       LANGUAGE plpgsql
   AS
   $$
@@ -128,7 +132,7 @@ const expression = `FUNCTION {schema}.{name}({parameters}) RETURNS numeric
   END ;
   $$;`;
 
-const routine = new Routine({
+export default new Routine({
   routineName: "augrade_total",
   expression,
   parameters: [
@@ -165,5 +169,3 @@ const routine = new Routine({
   ],
   schema: DB_SCHEMA,
 });
-
-export default routine.queryConstructor();
