@@ -3,9 +3,9 @@
  * @packageDocumentation
  */
 import * as yargs from "yargs";
-const getChangedGitFiles = require("changed-git-files");
 import { MigrationOptionType } from "@/utils/database-migrations/interfaces";
 import { MigrationGenerator } from "@/utils/database-migrations/MigrationGenerator";
+import { ChangedFilesDetector } from "@/utils/database-migrations/ChangedFilesDetector";
 //TODO: #CU-2943qg Migrations - Convert the custom migration system to a npm package
 
 export class MigrationGenerateCommand implements yargs.CommandModule {
@@ -26,6 +26,7 @@ export class MigrationGenerateCommand implements yargs.CommandModule {
       })
       .option("allow_custom", {
         alias: "custom",
+        default: "false",
         describe: `Consider the custom fields in the migration file, 
                 possible values: 'true' or 'false'`,
       });
@@ -38,14 +39,15 @@ export class MigrationGenerateCommand implements yargs.CommandModule {
      * and calls the generate method to start the generation of the migration file.
      */
     //TODO: #CU-294bdr Migrations - Improve the handling of arguments
-    getChangedGitFiles(async function (err, results): Promise<void> {
-      const generator = new MigrationGenerator({
-        name: args.name as string,
-        option: args.unit as MigrationOptionType,
-        modifiedFiles: results,
-        custom: args.custom as boolean,
-      });
-      await generator.generate();
+
+    const detector = new ChangedFilesDetector();
+    const changedFiles = detector.getChangedFiles();
+    const generator = new MigrationGenerator({
+      name: args.name as string,
+      option: args.unit as MigrationOptionType,
+      modifiedFiles: changedFiles,
+      custom: args.custom as boolean,
     });
+    await generator.generate();
   }
 }

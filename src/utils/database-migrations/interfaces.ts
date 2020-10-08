@@ -92,16 +92,6 @@ export interface AfterCreatedFunction {
 }
 
 /**
- * Represents a modified file in the project returned from the git library.
- */
-export interface ModifiedFile {
-  /** Name of the file. */
-  filename: string;
-  /** Status of the file. (modified, added) */
-  status: string;
-}
-
-/**
  * Represents the union of the MigrationSqls in a single string.
  */
 export interface MigrationFileContent {
@@ -169,7 +159,7 @@ export interface RoutineOptions extends BaseRoutineOptionsWithoutParameters {
 export interface GeneratorOptions {
   name: string;
   option: MigrationOptionType;
-  modifiedFiles: ModifiedFile[];
+  modifiedFiles: string[];
   custom: boolean;
 }
 

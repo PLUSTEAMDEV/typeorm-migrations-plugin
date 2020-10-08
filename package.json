@@ -16,11 +16,9 @@
    },
    "dependencies": {
       "@sqltools/formatter": "^1.2.2",
-      "changed-git-files": "0.0.1",
       "dotenv": "^8.2.0",
       "pg": "^8.3.3",
       "reflect-metadata": "^0.1.10",
-      "string-format": "^2.0.0",
       "ts-node": "^9.0.0",
       "tsconfig-paths": "^3.9.0",
       "typeorm": "0.2.25",
@@ -39,6 +37,7 @@
       "apply:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run",
       "revert:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert",
       "docs": "typedoc --options typedocs.json",
-      "postdocs": "http-server ./docs"
+      "postdocs": "http-server ./docs",
+      "changes": "ts-node -r tsconfig-paths/register src/utils/database-migrations/ChangedFilesDetector.ts"
    }
 }

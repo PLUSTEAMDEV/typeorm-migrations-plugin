@@ -15,7 +15,6 @@ import {
   MigrationFunctions,
   DatabaseStructure,
   MigrationSqls,
-  ModifiedFile,
   MigrationFileContent,
   MigrationOptionType,
   GeneratorOptions,
@@ -48,7 +47,7 @@ export class MigrationGenerator {
     this.option = options.option;
     this.custom = options.custom;
     this.structuresChanged = options.modifiedFiles
-      .map((files: ModifiedFile) => this.getStructure(files.filename))
+      .map((files: string) => this.getStructure(files))
       .filter((structure: DatabaseStructure) =>
         this.isMigrationRoute(structure)
       );
