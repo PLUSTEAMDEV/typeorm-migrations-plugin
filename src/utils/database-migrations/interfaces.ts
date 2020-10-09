@@ -1,3 +1,8 @@
+import {SimpleColumnType, WithLengthColumnType, WithPrecisionColumnType} from "typeorm/driver/types/ColumnTypes";
+import {ColumnCommonOptions} from "typeorm/decorator/options/ColumnCommonOptions";
+import {ColumnWithLengthOptions} from "typeorm/decorator/options/ColumnWithLengthOptions";
+import {ColumnNumericOptions} from "typeorm/decorator/options/ColumnNumericOptions";
+
 /**
  * Represents the up property of a migration function.
  */
@@ -70,6 +75,26 @@ export interface DatabaseExtension {
   /** Schema to which the extension belongs. */
   schema: string;
 }
+interface BaseDatabaseColumn {
+  name: string;
+}
+``
+export interface DatabaseSimpleColumn extends BaseDatabaseColumn{
+  type: SimpleColumnType;
+  options?: ColumnCommonOptions;
+}
+
+export interface DatabaseColumnWithLength extends BaseDatabaseColumn{
+  type: WithLengthColumnType;
+  options?: ColumnCommonOptions & ColumnWithLengthOptions;
+}
+
+export interface DatabaseColumnWithPrecisionColumnType extends BaseDatabaseColumn{
+  type: WithPrecisionColumnType;
+  options?: ColumnCommonOptions & ColumnNumericOptions
+}
+
+export type DatabaseColumn = DatabaseSimpleColumn | DatabaseColumnWithLength | DatabaseColumnWithPrecisionColumnType;
 
 /**
  * Represents a database structure file.
