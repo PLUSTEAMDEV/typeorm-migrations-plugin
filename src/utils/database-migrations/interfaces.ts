@@ -1,6 +1,3 @@
-/**
- * Represents the up property of a migration function.
- */
 interface CreateStructure {
   /** Array of queries to execute before create the structure in the database. */
   beforeCreated?: string[];
@@ -10,9 +7,6 @@ interface CreateStructure {
   afterCreated?: string;
 }
 
-/**
- * Represents the down property of a migration function.
- */
 interface DropStructure {
   /** Query to drop the structure of the database. */
   drop: string;
@@ -31,9 +25,6 @@ export interface MigrationSqls {
   down: string[];
 }
 
-/**
- * Represents an object to keeps the data in order for migrations.
- */
 export interface MigrationFunctions {
   /** The up object with the queries steps to created the structure. */
   up: CreateStructure;
@@ -45,13 +36,10 @@ export interface MigrationFunctions {
  * Represents a calculated field and its properties.
  */
 export interface CustomField {
-  /** The table of the field. */
   table: string;
-  /** Name of the field. */
   fieldName: string;
-  /** Expression to update the data of the field. */
+  /** Expression to update the data of the custom field. */
   expression: string;
-  /** Name of the constraint for the calculated field. */
   constraintName: string;
   /** Columns to be applied the constraint. */
   columns: string;
@@ -59,35 +47,27 @@ export interface CustomField {
   notNull: boolean;
 }
 
-/**
- * Represents a databases extension.
- */
 export interface DatabaseExtension {
-  /** Name of the extension. */
   name: string;
-  /** Comments for the extension. */
   comments: string;
-  /** Schema to which the extension belongs. */
   schema: string;
 }
 
 /**
  * Represents a database structure file.
  */
-export interface DatabaseStructure {
-  /** File path of the database structure. */
+export interface DatabaseUnit {
+  /** File path of the database unit. */
   path: string;
-  /** Type of logic to be applied (trigger, function). */
-  logicType: string;
+  /** Type of unit (trigger, function). */
+  unitType: MigrationOptionType;
 }
 
 /**
- * Represents a function to be applied in a Routine.
+ * Represents a function to be applied after the creation of Routine.
  */
 export interface AfterCreatedFunction {
-  /** Function to call in the afterCreated field of Routine. */
   func: Function;
-  /** Parameters of the function. */
   params: string[];
 }
 
@@ -95,46 +75,32 @@ export interface AfterCreatedFunction {
  * Represents the union of the MigrationSqls in a single string.
  */
 export interface MigrationFileContent {
-  /** The content for the up function in the migration. */
   up: string;
-  /** The content for the down function in the migration. */
   down: string;
 }
 
-/**
- * Represents a routine parameter.
- */
 export interface RoutineParameter {
-  /** Identifier of the parameter. */
   name: string;
   /** The Postgres type of the parameter. */
   type: string;
 }
 
-export interface BaseTriggerOptions {
-  /** The table to which the trigger relates. */
+export interface TriggerExpressionParameters {
   tableName: string;
-  /** Name of the routine that the triggers calls. */
   functionName: string;
-  /** Schema to which the table belongs. In the Trigger,
-   * schema is optional because default is the DB_SCHEMA variable
-   */
   schema?: string;
 }
 
-export interface TriggerOptions extends BaseTriggerOptions {
-  /** Name of the trigger in the database. */
+export interface TriggerOptions extends TriggerExpressionParameters {
   triggerName: string;
-  /** The logic for create the trigger.
+  /** The SQL sentence for create the trigger.
    * It is all the expression after the 'CREATE TRIGGER name'
    */
-  expression: (options: BaseTriggerOptions) => string;
+  expression: (options: TriggerExpressionParameters) => string;
 }
 
-export interface BaseRoutineOptions {
-  /** Name of the routine in the database. */
+export interface RoutineExpressionParameters {
   routineName: string;
-  /** An array of the parameters for the routine and its types. */
   parameters: string;
   /** Schema to which the routine belongs. In the Routine,
    * schema is optional because default is the DB_SCHEMA variable
@@ -142,16 +108,15 @@ export interface BaseRoutineOptions {
   schema?: string;
 }
 type BaseRoutineOptionsWithoutParameters = Omit<
-  BaseRoutineOptions,
+  RoutineExpressionParameters,
   "parameters"
 >;
 
 export interface RoutineOptions extends BaseRoutineOptionsWithoutParameters {
-  /** The logic for create the routine.
+  /** The SQl sentence for create the routine.
    * It is all the expression after the 'CREATE OR REPLACE'
    */
-  expression: (options: BaseRoutineOptions) => string;
-  /** Array of functions that returns queries to run after create the routine in the db. */
+  expression: (options: RoutineExpressionParameters) => string;
   afterCreated?: AfterCreatedFunction[];
   parameters?: RoutineParameter[];
 }
@@ -164,4 +129,11 @@ export interface GeneratorOptions {
 }
 
 /** Type for the different options for the generate:migrations command. */
-export type MigrationOptionType = "all" | "function" | "trigger" | "extension";
+export type MigrationOptionType =
+  | "all"
+  | "function"
+  | "trigger"
+  | "extension"
+  | "";
+
+export type GitFileStatus = "unstaged" | "staged" | "untracked";

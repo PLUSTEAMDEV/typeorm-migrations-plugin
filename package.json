@@ -30,14 +30,14 @@
       "create:migration:file": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:create -n",
       "generate:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -n",
       "pregenerate:migrations:all": "ts-node -r ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -n all-migrations",
-      "generate:migrations:all": "ts-node -r tsconfig-paths/register src/cli migration:generate --db_structure all --file_name",
-      "generate:migrations:functions": "ts-node -r tsconfig-paths/register src/cli migration:generate --db_structure function --file_name",
-      "generate:migrations:triggers": "ts-node -r tsconfig-paths/register src/cli migration:generate --db_structure trigger --file_name",
-      "generate:migrations:extensions": "ts-node -r tsconfig-paths/register src/cli migration:generate --db_structure extension --file_name",
+      "generate:migrations:all": "ts-node -r tsconfig-paths/register src/cli migration:generate --db_unit all --file_name",
+      "generate:migrations:functions": "ts-node -r tsconfig-paths/register src/cli migration:generate --db_unit function --file_name",
+      "generate:migrations:triggers": "ts-node -r tsconfig-paths/register src/cli migration:generate --db_unit trigger --file_name",
+      "generate:migrations:extensions": "ts-node -r tsconfig-paths/register src/cli migration:generate --db_unit extension --file_name",
       "apply:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run",
       "revert:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert",
       "docs": "typedoc --options typedocs.json",
       "postdocs": "http-server ./docs",
-      "changes": "ts-node -r tsconfig-paths/register src/utils/database-migrations/ChangedFilesDetector.ts"
+      "changes": "ts-node -r tsconfig-paths/register src/utils/database-migrations/GitChangedFilesDetector.ts"
    }
 }

@@ -5,7 +5,7 @@
 import * as yargs from "yargs";
 import { MigrationOptionType } from "@/utils/database-migrations/interfaces";
 import { MigrationGenerator } from "@/utils/database-migrations/MigrationGenerator";
-import { ChangedFilesDetector } from "@/utils/database-migrations/ChangedFilesDetector";
+import { GitChangedFilesDetector } from "@/utils/database-migrations/GitChangedFilesDetector";
 //TODO: #CU-2943qg Migrations - Convert the custom migration system to a npm package
 
 export class MigrationGenerateCommand implements yargs.CommandModule {
@@ -15,7 +15,7 @@ export class MigrationGenerateCommand implements yargs.CommandModule {
 
   builder(args: yargs.Argv) {
     return args
-      .option("db_structure", {
+      .option("db_unit", {
         alias: "unit",
         describe: `Database unit type to generate a migration, 
                 possible values: 'all', 'trigger', 'function' or 'extension'`,
@@ -40,7 +40,7 @@ export class MigrationGenerateCommand implements yargs.CommandModule {
      */
     //TODO: #CU-294bdr Migrations - Improve the handling of arguments
 
-    const detector = new ChangedFilesDetector();
+    const detector = new GitChangedFilesDetector();
     const changedFiles = detector.getChangedFiles();
     const generator = new MigrationGenerator({
       name: args.name as string,
