@@ -49,11 +49,5 @@ const expression = ({
 export default new Routine({
   routineName: "check_date_distinc",
   expression,
-  afterCreated: [
-    {
-      func: grantAccessToRoutine,
-      params: DB_USERS,
-    },
-  ],
   schema: DB_SCHEMA,
 });

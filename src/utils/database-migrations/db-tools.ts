@@ -1,7 +1,3 @@
-/**
- * This file contains functions to help in the migration process.
- * @packageDocumentation
- */
 import {
   CustomField,
   DatabaseExtension,
@@ -10,11 +6,6 @@ import {
 import { EXTENSIONS } from "migrationsconfig";
 import { Routine } from "@/utils/database-migrations/Routine";
 
-/**
- * Construct the query to create and drop the extension.
- * @param extension Extension object.
- * @return The migration function object of the extension.
- */
 function extensionConstructor(
   extension: DatabaseExtension
 ): MigrationFunctions {
@@ -30,7 +21,7 @@ function extensionConstructor(
 }
 
 /**
- * Construct the query to create and drop the extension.
+ * Construct the query to alter the owner of the routine.
  * @param routine Routine object.
  * @param users Database users to be the owners of the routine.
  * @return the alter functions queries in one string to give ownership to each user.
@@ -102,7 +93,4 @@ export function updateCalculatedFields(
   );
 }
 
-/**
- * The extensions for the database mapped to migration functions.
- */
 export const CONSTRUCTED_EXTENSIONS = EXTENSIONS.map(extensionConstructor);

@@ -1,7 +1,7 @@
 import { format } from "@sqltools/formatter/lib/sqlFormatter";
 import * as fs from "fs";
 import * as path from "path";
-const mkdirp = require("mkdirp");
+import * as mkdirp from "mkdirp";
 import {
   MIGRATIONS_PATH,
   CUSTOM_FIELDS,
@@ -13,7 +13,7 @@ import {
 } from "@/utils/database-migrations/db-tools";
 import {
   MigrationFunctions,
-  DatabaseStructure,
+  DatabaseUnit,
   MigrationSqls,
   MigrationFileContent,
   MigrationOptionType,
@@ -25,22 +25,21 @@ import {
  * Triggers, Routines, Extensions and Calculated Table's fields.
  */
 export class MigrationGenerator {
-  /** Name of migration file. It is received from the command line. */
   name: string;
-  /** Option for the migration process to search for changes in structures:
+  /** Option for the migration process to search for changes in database units:
    * function
    * trigger
    * extension
    */
   option: MigrationOptionType;
-  /** File with database structures with changes. */
-  structuresChanged: DatabaseStructure[];
+  /** File with database units with changes. */
+  structuresChanged: DatabaseUnit[];
   /** Option to consider the calculated fields in the migration. */
   custom: boolean;
 
   /**
    * Constructor of the generator. In here, the structuresChanged is
-   * mapped and filtered to search for the structures with changes.
+   * mapped and filtered to search for the units with changes.
    */
   constructor(options: GeneratorOptions) {
     this.name = options.name;
@@ -48,9 +47,7 @@ export class MigrationGenerator {
     this.custom = options.custom;
     this.structuresChanged = options.modifiedFiles
       .map((files: string) => this.getStructure(files))
-      .filter((structure: DatabaseStructure) =>
-        this.isMigrationRoute(structure)
-      );
+      .filter((structure: DatabaseUnit) => this.isMigrationRoute(structure));
   }
 
   /**
@@ -59,29 +56,29 @@ export class MigrationGenerator {
    * @param structure File structure.
    * @return a boolean to know if the file is in a migration path.
    */
-  isMigrationRoute(structure: DatabaseStructure): boolean {
+  isMigrationRoute(structure: DatabaseUnit): boolean {
     return (
-      structure.logicType === this.option ||
-      (this.option == "all" && structure.logicType !== "")
+      structure.unitType === this.option ||
+      (this.option == "all" && structure.unitType !== "")
     );
   }
 
   /**
-   * Function map the structures and gets the filename and the logic type.
+   * Function map the structures and gets the filename and the unit type.
    * @param filename File name where is the structure.
-   * @return structure with the name and the logic.
+   * @return structure with the name and the unit type.
    */
-  getStructure(filename): DatabaseStructure {
-    let logicType = "";
-    for (let routeObject of MIGRATION_ROUTES) {
-      if (filename.includes(routeObject.path)) {
-        logicType = routeObject.option;
+  getStructure(filename): DatabaseUnit {
+    let optionType = "";
+    for (let option of Object.keys(MIGRATION_ROUTES)) {
+      if (filename.includes(MIGRATION_ROUTES[option].path)) {
+        optionType = option;
         break;
       }
     }
     return {
       path: filename.replace(".ts", ""),
-      logicType: logicType,
+      unitType: optionType as MigrationOptionType,
     };
   }
 
@@ -119,7 +116,7 @@ export class MigrationGenerator {
    * Construct the template string with its content.
    * @param name Name of the migration file.
    * @param timestamp Timestamp when the file was created.
-   * @param content Logic for the up and down functions.
+   * @param content Content for the up and down functions.
    * @return the template string.
    */
   getTemplate(
@@ -219,8 +216,11 @@ export class ${name}${timestamp} implements MigrationInterface {
       const fileContent = this.getTemplate(this.name, timestamp, content);
       const filename = timestamp + "-" + this.name + ".ts";
       let directory = MIGRATIONS_PATH;
-      const pathOfFile =
-        process.cwd() + "/" + (directory ? directory + "/" : "") + filename;
+      const pathOfFile = path.join(
+        process.cwd(),
+        directory ? directory + "/" : "",
+        filename
+      );
       await this.createFile(pathOfFile, fileContent);
       console.log(`Migration has been generated successfully.`);
     } catch (err) {
@@ -257,7 +257,7 @@ export class ${name}${timestamp} implements MigrationInterface {
     queries: MigrationFunctions[]
   ): Promise<void> {
     const fileData = fs
-      .readFileSync(`${MIGRATIONS_PATH}/${fileName}`)
+      .readFileSync(path.join(MIGRATIONS_PATH, fileName))
       .toString();
     const lines = fileData.split("\n");
     const content = this.createUpAndDownFunctions(queries);
@@ -274,12 +274,12 @@ export class ${name}${timestamp} implements MigrationInterface {
     lines.splice(6, 0, "        " + content.up);
     lines.splice(lines.length - 4, 0, "        " + content.down);
     const unitedData = lines.join("\n");
-    fs.writeFileSync(`${MIGRATIONS_PATH}/${fileName}`, unitedData);
+    fs.writeFileSync(path.join(MIGRATIONS_PATH, fileName), unitedData);
     const partsFileName = fileName.split("-");
     const newFileName = `${partsFileName[0]}-${this.name}.ts`;
     fs.renameSync(
-      `${MIGRATIONS_PATH}/${fileName}`,
-      `${MIGRATIONS_PATH}/${newFileName}`
+      path.join(MIGRATIONS_PATH, fileName),
+      path.join(MIGRATIONS_PATH, newFileName)
     );
   }
 
@@ -311,11 +311,11 @@ export class ${name}${timestamp} implements MigrationInterface {
    * @param structure The object with the path to the structure.
    * @return The migrations functions of the imported object.
    */
-  getMigrationFunctionsFromPath(
-    structure: DatabaseStructure
-  ): MigrationFunctions {
-    const importedStructure = require(structure.path).default;
-    return importedStructure.queryConstructor();
+  async getMigrationFunctionsFromPath(
+    structure: DatabaseUnit
+  ): Promise<MigrationFunctions> {
+    const importedStructure = await import(structure.path);
+    return importedStructure.default.queryConstructor();
   }
 
   /**
@@ -333,8 +333,11 @@ export class ${name}${timestamp} implements MigrationInterface {
     if (this.option == "extension") {
       queries = CONSTRUCTED_EXTENSIONS;
     } else {
-      queries = this.structuresChanged.map((structure: DatabaseStructure) =>
-        this.getMigrationFunctionsFromPath(structure)
+      queries = await Promise.all(
+        this.structuresChanged.map(
+          async (structure: DatabaseUnit) =>
+            await this.getMigrationFunctionsFromPath(structure)
+        )
       );
     }
     if (this.option != "all") {

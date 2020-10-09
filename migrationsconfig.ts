@@ -3,24 +3,20 @@
  * @packageDocumentation
  */
 require("dotenv").config();
-const { DB_USER } = process.env;
+const { DB_USER, DB_PUBLIC_SCHEMA } = process.env;
 
 export const MIGRATIONS_PATH = "src/migration";
 
-/** Paths to the files of the database structures. */
-export const MIGRATION_ROUTES = [
-  {
+export const MIGRATION_ROUTES = {
+  function: {
     path: "src/routines/functions",
-    option: "function",
   },
-  {
+  trigger: {
     path: "triggers",
-    option: "trigger",
   },
-];
+};
 
-/** Public schema of the database. */
-export const DB_SCHEMA = "public";
+export const DB_SCHEMA = DB_PUBLIC_SCHEMA;
 
 //TODO: #CU-294dey Improve the calculated field process
 /** Calculated fields to be taken in account during the migration process. */
@@ -41,5 +37,4 @@ export const EXTENSIONS = [
   },
 ];
 
-/** Database users. */
 export const DB_USERS = [DB_USER];

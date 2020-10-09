@@ -161,11 +161,5 @@ export default new Routine({
       type: INTEGER,
     },
   ],
-  afterCreated: [
-    {
-      func: grantAccessToRoutine,
-      params: DB_USERS,
-    },
-  ],
   schema: DB_SCHEMA,
 });

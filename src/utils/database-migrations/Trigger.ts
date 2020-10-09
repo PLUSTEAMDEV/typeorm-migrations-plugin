@@ -3,35 +3,20 @@ import {
   TriggerOptions,
 } from "@/utils/database-migrations/interfaces";
 import { MIGRATION_ROUTES, DB_SCHEMA } from "migrationsconfig";
+import * as path from "path";
 
-/**
- * Class Trigger
- * This class represent a database trigger.
- */
 export class Trigger {
-  /** Name of the trigger in the database. */
   name: string;
-  /** The logic for create the trigger.
-   * It is all the expression after the 'CREATE TRIGGER name'
-   */
   expression: string;
-  /** The table to which the trigger relates. */
   tableName: string;
-  /** Name of the routine that the triggers calls. */
   functionName: string;
-  /** Schema to which the table belongs.
-   * in the constructor options is optional, default is the DB_SCHEMA variable */
   schema: string;
 
-  /**
-   * Constructor of the trigger. In here, the expression is
-   * formatted with the schema, table and routine.
-   */
   constructor(options: TriggerOptions) {
     this.name = options.triggerName;
     this.tableName = options.tableName;
     this.functionName = options.functionName;
-    this.schema = "schema" in options ? options.schema : DB_SCHEMA;
+    this.schema = options.schema || DB_SCHEMA;
     this.expression = options.expression({
       schema: this.schema,
       tableName: this.tableName,
@@ -54,8 +39,10 @@ export class Trigger {
       /(^\w|_\w)/g,
       this.clearAndUpper
     );
-    const importedRoutine = require(`${MIGRATION_ROUTES[0].path}/${routineFileName}.ts`)
-      .default;
+    const importedRoutine = require(path.join(
+      MIGRATION_ROUTES.function.path,
+      routineFileName + ".ts"
+    )).default;
     return importedRoutine.queryConstructor();
   }
 

@@ -35,11 +35,5 @@ const expression = ({
 export default new Routine({
   routineName: "update_validate_import",
   expression,
-  afterCreated: [
-    {
-      func: grantAccessToRoutine,
-      params: DB_USERS,
-    },
-  ],
   schema: DB_SCHEMA,
 });

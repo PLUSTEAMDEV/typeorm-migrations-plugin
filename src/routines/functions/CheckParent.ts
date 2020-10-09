@@ -36,11 +36,5 @@ const expression = ({
 export default new Routine({
   routineName: "check_parent",
   expression,
-  afterCreated: [
-    {
-      func: grantAccessToRoutine,
-      params: DB_USERS,
-    },
-  ],
   schema: DB_SCHEMA,
 });
