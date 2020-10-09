@@ -20,11 +20,11 @@ export class MigrationGenerateCommand implements yargs.CommandModule {
         describe: `Database unit type to generate a migration, 
                 possible values: 'all', 'trigger', 'function' or 'extension'`,
       })
-      .option("file_name", {
+      .option("migration_name", {
         alias: "name",
-        describe: `Name of the migration file to be generated.'`,
+        describe: `Name of the migration to be generated.'`,
       })
-      .option("allow_custom", {
+      .option("allow_custom_fields", {
         alias: "custom",
         default: "false",
         describe: `Consider the custom fields in the migration file, 

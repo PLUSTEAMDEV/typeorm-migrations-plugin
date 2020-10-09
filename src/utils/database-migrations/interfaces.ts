@@ -119,6 +119,7 @@ export interface RoutineOptions extends BaseRoutineOptionsWithoutParameters {
   expression: (options: RoutineExpressionParameters) => string;
   afterCreated?: AfterCreatedFunction[];
   parameters?: RoutineParameter[];
+  grantAccessToUsers?: boolean;
 }
 
 export interface GeneratorOptions {

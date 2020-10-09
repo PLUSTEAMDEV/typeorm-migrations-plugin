@@ -4,7 +4,8 @@ import {
   RoutineOptions,
   RoutineParameter,
 } from "@/utils/database-migrations/interfaces";
-import { DB_SCHEMA } from "migrationsconfig";
+import { DB_SCHEMA, DB_USERS } from "migrationsconfig";
+import { grantAccessToRoutine } from "@/utils/database-migrations/db-tools";
 
 export class Routine {
   name: string;
@@ -13,6 +14,7 @@ export class Routine {
   afterCreated: AfterCreatedFunction[];
   parameters: string;
   schema: string;
+  grantAccessToUsers: boolean;
 
   constructor(options: RoutineOptions) {
     this.name = options.routineName;
@@ -24,6 +26,13 @@ export class Routine {
       .join(", ");
     this.afterCreated = options.afterCreated || [];
     this.schema = options.schema || DB_SCHEMA;
+    this.grantAccessToUsers = options.grantAccessToUsers || true;
+    if (this.grantAccessToUsers) {
+      this.afterCreated.push({
+        func: grantAccessToRoutine,
+        params: DB_USERS,
+      });
+    }
     this.expression = options.expression({
       schema: this.schema,
       routineName: this.name,
