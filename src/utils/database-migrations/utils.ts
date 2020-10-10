@@ -10,6 +10,30 @@ import {
 import { EXTENSIONS } from "migrationsconfig";
 import { Routine } from "@/utils/database-migrations/Routine";
 import { execSync } from "child_process";
+import * as mkdirp from "mkdirp";
+import * as path from "path";
+import * as util from "util";
+import * as fs from "fs";
+
+const writeFilePromise = util.promisify(fs.writeFile);
+/**
+ * Function to know if the structure is in a migration route.
+ * With the 'all' option it takes triggers and functions routes.
+ * @param filePath Filepath to the directory.
+ * @param content Content of the file.
+ * @param override Override option to know if overrides the file.
+ * @return a promise when the file is created.
+ */
+export async function createFile(
+    filePath: string,
+    content: string,
+    override: boolean = true
+): Promise<void> {
+  await mkdirp(path.dirname(filePath));
+  if(override) {
+    await writeFilePromise(filePath, content);
+  }
+}
 
 /**
  * Construct the query to create and drop the extension.
@@ -103,7 +127,7 @@ export function updateCalculatedFields(
   );
 }
 
-export function getFileArrayFromCommand(command: string) {
+export function getLinesFromCommand(command: string) {
   return execSync(command).toString().split("\n");
 }
 
