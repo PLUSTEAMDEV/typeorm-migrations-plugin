@@ -5,8 +5,10 @@ const expression = ({
   schema,
   routineName,
   parameters,
-}): string => `FUNCTION ${schema}.${routineName}(${parameters}) RETURNS numeric
-      LANGUAGE plpgsql
+}): string =>
+  `
+  FUNCTION ${schema}.${routineName}(${parameters}) RETURNS numeric
+    LANGUAGE plpgsql
   AS
   $$
   DECLARE

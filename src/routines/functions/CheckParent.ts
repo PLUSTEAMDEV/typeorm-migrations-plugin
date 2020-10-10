@@ -5,7 +5,9 @@ const expression = ({
   schema,
   routineName,
   parameters,
-}): string => `FUNCTION ${schema}.${routineName}(${parameters})
+}): string =>
+  `
+  FUNCTION ${schema}.${routineName}(${parameters})
     RETURNS TRIGGER
     LANGUAGE plpgsql
   AS
