@@ -1,25 +1,25 @@
 import { GitFileStatus } from "@/utils/database-migrations/interfaces";
-import { getFileArrayFromCommand } from "@/utils/database-migrations/utils";
+import { getLinesFromCommand } from "@/utils/database-migrations/utils";
 
 export class GitChangedFilesDetector {
-  getUnTrackedFiles = getFileArrayFromCommand.bind(
+  static getUnTrackedFiles = getLinesFromCommand.bind(
     null,
     `git ls-files --others --exclude-standard`
   );
-  getUnstagedFiles = getFileArrayFromCommand.bind(
+  static getUnstagedFiles = getLinesFromCommand.bind(
     null,
     `git diff --relative --name-only`
   );
-  getStagedFiles = getFileArrayFromCommand.bind(
+  static getStagedFiles = getLinesFromCommand.bind(
     null,
     `git diff --relative --name-only --staged`
   );
 
-  getChangedFiles(): string[] {
+  static getChangedFiles(): string[] {
     const getFileMap: Record<GitFileStatus, () => string[]> = {
-      untracked: this.getUnTrackedFiles,
-      unstaged: this.getUnstagedFiles,
-      staged: this.getStagedFiles,
+      untracked: GitChangedFilesDetector.getUnTrackedFiles,
+      unstaged: GitChangedFilesDetector.getUnstagedFiles,
+      staged: GitChangedFilesDetector.getStagedFiles,
     };
     const changedFiles: Set<string> = new Set();
     for (const getFiles of Object.values(getFileMap)) {
