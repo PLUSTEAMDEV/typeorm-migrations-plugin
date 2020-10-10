@@ -10,7 +10,7 @@ import {
 import {
   CONSTRUCTED_EXTENSIONS,
   updateCalculatedFields,
-} from "@/utils/database-migrations/db-tools";
+} from "@/utils/database-migrations/utils";
 import {
   MigrationFunctions,
   DatabaseUnit,

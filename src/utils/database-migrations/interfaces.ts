@@ -1,7 +1,11 @@
-import {SimpleColumnType, WithLengthColumnType, WithPrecisionColumnType} from "typeorm/driver/types/ColumnTypes";
-import {ColumnCommonOptions} from "typeorm/decorator/options/ColumnCommonOptions";
-import {ColumnWithLengthOptions} from "typeorm/decorator/options/ColumnWithLengthOptions";
-import {ColumnNumericOptions} from "typeorm/decorator/options/ColumnNumericOptions";
+import {
+  SimpleColumnType,
+  WithLengthColumnType,
+  WithPrecisionColumnType,
+} from "typeorm/driver/types/ColumnTypes";
+import { ColumnCommonOptions } from "typeorm/decorator/options/ColumnCommonOptions";
+import { ColumnWithLengthOptions } from "typeorm/decorator/options/ColumnWithLengthOptions";
+import { ColumnNumericOptions } from "typeorm/decorator/options/ColumnNumericOptions";
 
 interface CreateStructure {
   /** Array of queries to execute before create the structure in the database. */
@@ -62,22 +66,26 @@ interface BaseDatabaseColumn {
   name: string;
 }
 
-export interface DatabaseSimpleColumn extends BaseDatabaseColumn{
+export interface DatabaseSimpleColumn extends BaseDatabaseColumn {
   type: SimpleColumnType;
   options?: ColumnCommonOptions;
 }
 
-export interface DatabaseColumnWithLength extends BaseDatabaseColumn{
+export interface DatabaseColumnWithLength extends BaseDatabaseColumn {
   type: WithLengthColumnType;
   options?: ColumnCommonOptions & ColumnWithLengthOptions;
 }
 
-export interface DatabaseColumnWithPrecisionColumnType extends BaseDatabaseColumn{
+export interface DatabaseColumnWithPrecisionColumnType
+  extends BaseDatabaseColumn {
   type: WithPrecisionColumnType;
-  options?: ColumnCommonOptions & ColumnNumericOptions
+  options?: ColumnCommonOptions & ColumnNumericOptions;
 }
 
-export type DatabaseColumn = DatabaseSimpleColumn | DatabaseColumnWithLength | DatabaseColumnWithPrecisionColumnType;
+export type DatabaseColumn =
+  | DatabaseSimpleColumn
+  | DatabaseColumnWithLength
+  | DatabaseColumnWithPrecisionColumnType;
 
 /**
  * Represents a database structure file.
@@ -103,12 +111,6 @@ export interface AfterCreatedFunction {
 export interface MigrationFileContent {
   up: string;
   down: string;
-}
-
-export interface RoutineParameter {
-  name: string;
-  /** The Postgres type of the parameter. */
-  type: string;
 }
 
 export interface TriggerExpressionParameters {
@@ -144,7 +146,7 @@ export interface RoutineOptions extends BaseRoutineOptionsWithoutParameters {
    */
   expression: (options: RoutineExpressionParameters) => string;
   afterCreated?: AfterCreatedFunction[];
-  parameters?: RoutineParameter[];
+  parameters?: DatabaseColumn[];
   grantAccessToUsers?: boolean;
 }
 

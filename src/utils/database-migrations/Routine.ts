@@ -2,10 +2,11 @@ import {
   AfterCreatedFunction,
   MigrationFunctions,
   RoutineOptions,
-  RoutineParameter,
+  DatabaseColumn,
 } from "@/utils/database-migrations/interfaces";
 import { DB_SCHEMA, DB_USERS } from "migrationsconfig";
-import { grantAccessToRoutine } from "@/utils/database-migrations/db-tools";
+import { grantAccessToRoutine } from "@/utils/database-migrations/utils";
+import { PostgresUtils } from "@/utils/database-migrations/PostgresUtils";
 
 export class Routine {
   name: string;
@@ -21,7 +22,11 @@ export class Routine {
     const parameters = options.parameters || [];
     this.parameters = parameters
       .map(
-        (parameter: RoutineParameter) => `${parameter.name}  ${parameter.type}`
+        (parameter: DatabaseColumn) =>
+          `${parameter.name}  ${PostgresUtils.createFullType(
+            parameter.type,
+            parameter.options
+          )}`
       )
       .join(", ");
     this.afterCreated = options.afterCreated || [];

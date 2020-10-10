@@ -1,6 +1,5 @@
 import { Routine } from "@/utils/database-migrations/Routine";
-import { grantAccessToRoutine } from "@/utils/database-migrations/db-tools";
-import { DB_USERS, DB_SCHEMA } from "migrationsconfig";
+import { DB_SCHEMA } from "migrationsconfig";
 
 const expression = ({
   schema,

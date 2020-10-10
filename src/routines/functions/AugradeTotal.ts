@@ -1,11 +1,5 @@
 import { Routine } from "@/utils/database-migrations/Routine";
-import { grantAccessToRoutine } from "@/utils/database-migrations/db-tools";
-import { DB_USERS, DB_SCHEMA } from "migrationsconfig";
-import {
-  CHARACTER_VARYING,
-  INTEGER,
-  TIMESTAMP_WITHOUT_TIMEZONE,
-} from "@/utils/database-migrations/constants";
+import { DB_SCHEMA } from "migrationsconfig";
 
 const expression = ({
   schema,
@@ -138,27 +132,27 @@ export default new Routine({
   parameters: [
     {
       name: "from_calc",
-      type: TIMESTAMP_WITHOUT_TIMEZONE,
+      type: "timestamp without time zone",
     },
     {
       name: "to_calc",
-      type: TIMESTAMP_WITHOUT_TIMEZONE,
+      type: "timestamp without time zone",
     },
     {
       name: "id_time_unit",
-      type: CHARACTER_VARYING,
+      type: "character varying",
     },
     {
       name: "id_location",
-      type: INTEGER,
+      type: "integer",
     },
     {
       name: "id_classification",
-      type: INTEGER,
+      type: "integer",
     },
     {
       name: "id_space",
-      type: INTEGER,
+      type: "integer",
     },
   ],
   schema: DB_SCHEMA,
