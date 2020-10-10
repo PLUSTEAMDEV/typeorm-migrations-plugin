@@ -1,12 +1,7 @@
 import { Routine } from "@/utils/database-migrations/Routine";
 import { DB_SCHEMA } from "migrationsconfig";
 
-const expression = ({
-  schema,
-  routineName,
-  parameters,
-}): string =>
-  `
+const expression = ({ schema, routineName, parameters }): string => `
   FUNCTION ${schema}.${routineName}(${parameters})
     RETURNS TRIGGER
     LANGUAGE plpgsql
