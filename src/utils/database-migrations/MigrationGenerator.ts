@@ -1,227 +1,60 @@
-import { format } from "@sqltools/formatter/lib/sqlFormatter";
 import * as fs from "fs";
 import * as path from "path";
-import * as mkdirp from "mkdirp";
+import { MIGRATIONS_PATH } from "migrationsconfig";
+import { createFile } from "@/utils/database-migrations/utils";
 import {
-  MIGRATIONS_PATH,
-  CUSTOM_FIELDS,
-  MIGRATION_ROUTES,
-} from "migrationsconfig";
-import {
-  CONSTRUCTED_EXTENSIONS,
-  updateCalculatedFields,
-} from "@/utils/database-migrations/utils";
-import {
-  MigrationFunctions,
-  DatabaseUnit,
   MigrationSqls,
-  MigrationFileContent,
-  MigrationOptionType,
   GeneratorOptions,
+  DatabaseUnitType,
 } from "@/utils/database-migrations/interfaces";
+import { MigrationUtils } from "./MigrationUtils";
+import { MigrationFactory } from "@/utils/database-migrations/MigrationFactory";
 
 /**
  * Generates or updates the migration file with the changes for:
  * Triggers, Routines, Extensions and Calculated Table's fields.
  */
 export class MigrationGenerator {
-  name: string;
-  /** Option for the migration process to search for changes in database units:
-   * function
-   * trigger
-   * extension
-   */
-  option: MigrationOptionType;
-  /** File with database units with changes. */
-  structuresChanged: DatabaseUnit[];
-  /** Option to consider the calculated fields in the migration. */
-  custom: boolean;
+  options: GeneratorOptions;
+  databaseUnitTypes: DatabaseUnitType[];
 
-  /**
-   * Constructor of the generator. In here, the structuresChanged is
-   * mapped and filtered to search for the units with changes.
-   */
   constructor(options: GeneratorOptions) {
-    this.name = options.name;
-    this.option = options.option;
-    this.custom = options.custom;
-    this.structuresChanged = options.modifiedFiles
-      .map((files: string) => this.getStructure(files))
-      .filter((structure: DatabaseUnit) => this.isMigrationRoute(structure));
+    this.setOptions(options);
   }
 
-  /**
-   * Function to know if the structure is in a migration route.
-   * With the 'all' option it takes triggers and functions routes.
-   * @param structure File structure.
-   * @return a boolean to know if the file is in a migration path.
-   */
-  isMigrationRoute(structure: DatabaseUnit): boolean {
-    return (
-      structure.unitType === this.option ||
-      (this.option == "all" && structure.unitType !== "")
-    );
-  }
-
-  /**
-   * Function map the structures and gets the filename and the unit type.
-   * @param filename File name where is the structure.
-   * @return structure with the name and the unit type.
-   */
-  getStructure(filename): DatabaseUnit {
-    let optionType = "";
-    for (let option of Object.keys(MIGRATION_ROUTES)) {
-      if (filename.includes(MIGRATION_ROUTES[option].path)) {
-        optionType = option;
-        break;
-      }
-    }
-    return {
-      path: filename.replace(".ts", ""),
-      unitType: optionType as MigrationOptionType,
+  setOptions(options: GeneratorOptions) {
+    const defaultOptions = {
+      updateLastMigration: false,
     };
-  }
-
-  /**
-   * Function to know if the structure is in a migration route.
-   * With the 'all' option it takes triggers and functions routes.
-   * @param filePath Filepath to the directory.
-   * @param content Content of the file.
-   * @param override Override option to know if overrides the file.
-   * @return a promise when the file is created.
-   */
-  async createFile(
-    filePath: string,
-    content: string,
-    override: boolean = true
-  ): Promise<void> {
-    await mkdirp(path.dirname(filePath));
-    return new Promise<void>((ok, fail) => {
-      if (override === false && fs.existsSync(filePath)) return ok();
-      fs.writeFile(filePath, content, (err) => (err ? fail(err) : ok()));
-    });
-  }
-
-  /**
-   * Formats the sql query with blank spaces.
-   * @param query Filepath to the directory.
-   * @return formatted query.
-   */
-  prettifyQuery(query: string) {
-    const formattedQuery = format(query, { indent: "    " });
-    return "\n" + formattedQuery.replace(/^/gm, "            ") + "\n        ";
-  }
-
-  /**
-   * Construct the template string with its content.
-   * @param name Name of the migration file.
-   * @param timestamp Timestamp when the file was created.
-   * @param content Content for the up and down functions.
-   * @return the template string.
-   */
-  getTemplate(
-    name: string,
-    timestamp: number,
-    content: MigrationFileContent
-  ): string {
-    return `import {MigrationInterface, QueryRunner} from "typeorm";
-export class ${name}${timestamp} implements MigrationInterface {
-    name = '${name}${timestamp}'
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        ${content.up}
-    }
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        ${content.down}
-    }
-}`;
-  }
-
-  /**
-   * Convert the migration function to the query runners syntax:
-   * `await queryRunner.query(SOME_QUERY);`.
-   * @param query Migration function object.
-   * @return An array with the queryRunners for up and down functions.
-   */
-  getQueryRunner(query: MigrationFunctions): MigrationSqls {
-    let queryRunners: MigrationSqls = { up: [], down: [] };
-    if ("beforeCreated" in query.up) {
-      for (let before of query.up.beforeCreated) {
-        if (before) {
-          queryRunners.up.push(
-            `await queryRunner.query(\`${this.prettifyQuery(before)}\`);`
-          );
-        }
-      }
-    }
-    if (query.up.create) {
-      queryRunners.up.push(
-        `await queryRunner.query(\`${this.prettifyQuery(query.up.create)}\`);`
-      );
-    }
-    if ("afterCreated" in query.up && query.up.afterCreated) {
-      queryRunners.up.push(
-        `await queryRunner.query(\`${this.prettifyQuery(
-          query.up.afterCreated
-        )}\`);`
-      );
-    }
-    if (query.down.drop) {
-      queryRunners.down.push(
-        `await queryRunner.query(\`${query.down.drop}\`);`
-      );
-    }
-    if ("afterDrop" in query.down && query.down.afterDrop) {
-      queryRunners.down.push(
-        `await queryRunner.query(\`${this.prettifyQuery(
-          query.down.afterDrop
-        )}\`);`
-      );
-    }
-    return queryRunners;
-  }
-
-  /**
-   * First map the queries in the migrationFunctions structure to the queryRunner syntax,
-   * then join the up and down function of the queryRunners in a string to send it to the template file.
-   * @param queries Migration function array.
-   * @return The union of the queryRunners in a single string for up and down functions.
-   */
-  createUpAndDownFunctions(
-    queries: MigrationFunctions[]
-  ): MigrationFileContent {
-    const queryRunners = queries.map((query: MigrationFunctions) =>
-      this.getQueryRunner(query)
-    );
-    return {
-      up: queryRunners
-        .map((queryRunner: MigrationSqls) => queryRunner.up.join("\n        "))
-        .join("\n        "),
-      down: queryRunners
-        .map((queryRunner: MigrationSqls) =>
-          queryRunner.down.join("\n        ")
-        )
-        .join("\n        "),
-    };
+    this.options = Object.assign({}, defaultOptions, options);
+    this.databaseUnitTypes =
+      options.databaseUnitType === "all"
+        ? ["function", "trigger", "customField", "extension"]
+        : [options.databaseUnitType];
   }
 
   /**
    * Insert the up a down content in the template string and creates the migration files.
-   * @param queries Migration function array.
+   * @param migrationSqls Migration function array.
    * @return A promise when the file is created.
    */
-  async createMigrationFile(queries: MigrationFunctions[]): Promise<void> {
+  async createMigrationFile(migrationSqls: MigrationSqls): Promise<void> {
     try {
       const timestamp = new Date().getTime();
-      const content = this.createUpAndDownFunctions(queries);
-      const fileContent = this.getTemplate(this.name, timestamp, content);
-      const filename = timestamp + "-" + this.name + ".ts";
+      const content = MigrationUtils.buildMigrationContent(migrationSqls);
+      const fileContent = MigrationUtils.getTemplate(
+        this.options.migrationName,
+        timestamp,
+        content
+      );
+      const filename = timestamp + "-" + this.options.migrationName + ".ts";
       let directory = MIGRATIONS_PATH;
-      const pathOfFile = path.join(
+      const filePath = path.join(
         process.cwd(),
         directory ? directory + "/" : "",
         filename
       );
-      await this.createFile(pathOfFile, fileContent);
+      await createFile(filePath, fileContent);
       console.log(`Migration has been generated successfully.`);
     } catch (err) {
       console.log("Error during migration creation:");
@@ -230,53 +63,29 @@ export class ${name}${timestamp} implements MigrationInterface {
   }
 
   /**
-   * Gets the "all-migrations" file generated by the generate:migrations:all command.
-   * If the last file in the directory does not include "all-migrations" then returns "";
-   * @return file name of the migration file generated.
-   */
-  //TODO: #CU-2943u4 Improve the process of the most recent migration file
-  async getMostRecentMigrationFile(): Promise<string> {
-    let dir = path.resolve(MIGRATIONS_PATH);
-    let files = fs.readdirSync(dir);
-    return files[files.length - 1].includes("all-migrations")
-      ? files[files.length - 1]
-      : "";
-  }
-
-  /**
    * Update the migration file generated by TypeORM and include the changes of
    * triggers and functions in the up and down methods.
    * If the custom option is true, then also include the queries for the calculated fields.
    * @param fileName The file generated by TypeORM.
-   * @param queries Migration function array.
+   * @param migrationSqls Migration function array.
    * @return A promise when the file is updated.
    */
   //TODO: #CU-2949ew Research about a tool to merge files
   async modifyMigrationFile(
     fileName: string,
-    queries: MigrationFunctions[]
+    migrationSqls: MigrationSqls
   ): Promise<void> {
     const fileData = fs
       .readFileSync(path.join(MIGRATIONS_PATH, fileName))
       .toString();
     const lines = fileData.split("\n");
-    const content = this.createUpAndDownFunctions(queries);
-    if (this.custom && CUSTOM_FIELDS.length) {
-      const updateFieldFunctions = updateCalculatedFields(CUSTOM_FIELDS);
-      const UpdateQueryRunner = this.createUpAndDownFunctions(
-        updateFieldFunctions
-      );
-      const endUpFunction = lines.indexOf("    }");
-      lines.splice(endUpFunction, 0, "        " + UpdateQueryRunner.up);
-      const startDownFunction = lines.indexOf("    }") + 3;
-      lines.splice(startDownFunction, 0, "        " + UpdateQueryRunner.down);
-    }
+    const content = MigrationUtils.buildMigrationContent(migrationSqls);
     lines.splice(6, 0, "        " + content.up);
     lines.splice(lines.length - 4, 0, "        " + content.down);
     const unitedData = lines.join("\n");
     fs.writeFileSync(path.join(MIGRATIONS_PATH, fileName), unitedData);
     const partsFileName = fileName.split("-");
-    const newFileName = `${partsFileName[0]}-${this.name}.ts`;
+    const newFileName = `${partsFileName[0]}-${this.options.migrationName}.ts`;
     fs.renameSync(
       path.join(MIGRATIONS_PATH, fileName),
       path.join(MIGRATIONS_PATH, newFileName)
@@ -287,35 +96,23 @@ export class ${name}${timestamp} implements MigrationInterface {
    * If TypeORM detects changes in the entities or the views, it will generate a migration file,
    * so we get that fileName an modify its content with the changes of the structures (triggers, routines, etc)
    * If TypeORM does not generate a file, then it calls the createMigrationFile.
-   * @param queries Migration function array.
+   * @param migrationSqls Migration function array.
    * @return A promise when the file is created or updated.
    */
   async createOrUpdateMigrationFile(
-    queries: MigrationFunctions[]
+    migrationSqls: MigrationSqls
   ): Promise<void> {
     try {
-      const fileName = await this.getMostRecentMigrationFile();
+      const fileName = await MigrationUtils.getMostRecentMigrationFile();
       if (!fileName) {
-        await this.createMigrationFile(queries);
+        await this.createMigrationFile(migrationSqls);
       } else {
-        await this.modifyMigrationFile(fileName, queries);
+        await this.modifyMigrationFile(fileName, migrationSqls);
       }
     } catch (err) {
       console.log("Error during migration update:");
       console.error(err);
     }
-  }
-
-  /**
-   * Import the structure object (Trigger, Routine..) and get the query constructor of each one.
-   * @param structure The object with the path to the structure.
-   * @return The migrations functions of the imported object.
-   */
-  async getMigrationFunctionsFromPath(
-    structure: DatabaseUnit
-  ): Promise<MigrationFunctions> {
-    const importedStructure = await import(structure.path);
-    return importedStructure.default.queryConstructor();
   }
 
   /**
@@ -325,25 +122,22 @@ export class ${name}${timestamp} implements MigrationInterface {
    * @return A promise when the file is generated.
    */
   async generate(): Promise<void> {
-    if (this.structuresChanged.length === 0 && !this.custom) {
-      console.log("There are not changes in the files.");
-      return;
+    const databaseMigrations = await MigrationFactory.getDatabaseUnitMigrations(
+      this.databaseUnitTypes
+    );
+    const migrationSqls: MigrationSqls = {
+      upSqls: [],
+      downSqls: [],
+    };
+    for (const migration of databaseMigrations) {
+      await migration.build();
+      migrationSqls.upSqls.push(...migration.upSqls);
+      migrationSqls.downSqls.push(...migration.downSqls);
     }
-    let queries;
-    if (this.option == "extension") {
-      queries = CONSTRUCTED_EXTENSIONS;
+    if (this.options.updateLastMigration) {
+      await this.createOrUpdateMigrationFile(migrationSqls);
     } else {
-      queries = await Promise.all(
-        this.structuresChanged.map(
-          async (structure: DatabaseUnit) =>
-            await this.getMigrationFunctionsFromPath(structure)
-        )
-      );
-    }
-    if (this.option != "all") {
-      await this.createMigrationFile(queries);
-    } else {
-      await this.createOrUpdateMigrationFile(queries);
+      await this.createMigrationFile(migrationSqls);
     }
   }
 }

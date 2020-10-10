@@ -3,9 +3,8 @@
  * @packageDocumentation
  */
 import * as yargs from "yargs";
-import { MigrationOptionType } from "@/utils/database-migrations/interfaces";
+import { DatabaseUnitType } from "@/utils/database-migrations/interfaces";
 import { MigrationGenerator } from "@/utils/database-migrations/MigrationGenerator";
-import { GitChangedFilesDetector } from "@/utils/database-migrations/GitChangedFilesDetector";
 //TODO: #CU-2943qg Migrations - Convert the custom migration system to a npm package
 
 export class MigrationGenerateCommand implements yargs.CommandModule {
@@ -24,29 +23,18 @@ export class MigrationGenerateCommand implements yargs.CommandModule {
         alias: "name",
         describe: `Name of the migration to be generated.'`,
       })
-      .option("allow_custom_fields", {
-        alias: "custom",
+      .option("update_last_migration", {
         default: "false",
-        describe: `Consider the custom fields in the migration file, 
+        describe: `Updates the last created migration instead of creating a new one 
                 possible values: 'true' or 'false'`,
       });
   }
 
   async handler(args: yargs.Arguments) {
-    /**
-     * Function which detects the files with changes since the last commit,
-     * creates the Migration generator object with the options from the command line
-     * and calls the generate method to start the generation of the migration file.
-     */
-    //TODO: #CU-294bdr Migrations - Improve the handling of arguments
-
-    const detector = new GitChangedFilesDetector();
-    const changedFiles = detector.getChangedFiles();
     const generator = new MigrationGenerator({
-      name: args.name as string,
-      option: args.unit as MigrationOptionType,
-      modifiedFiles: changedFiles,
-      custom: args.custom as boolean,
+      migrationName: args.name as string,
+      databaseUnitType: args.unit as DatabaseUnitType | "all",
+      updateLastMigration: args.updateLastMigration as boolean,
     });
     await generator.generate();
   }

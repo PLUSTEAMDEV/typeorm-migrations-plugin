@@ -29,9 +29,9 @@ interface DropStructure {
  */
 export interface MigrationSqls {
   /** Array of strings for the up function in the migration file. */
-  up: string[];
+  upSqls: string[];
   /** Array of strings runners for the down function in the migration file. */
-  down: string[];
+  downSqls: string[];
 }
 
 export interface MigrationFunctions {
@@ -88,16 +88,6 @@ export type DatabaseColumn =
   | DatabaseColumnWithPrecisionColumnType;
 
 /**
- * Represents a database structure file.
- */
-export interface DatabaseUnit {
-  /** File path of the database unit. */
-  path: string;
-  /** Type of unit (trigger, function). */
-  unitType: MigrationOptionType;
-}
-
-/**
  * Represents a function to be applied after the creation of Routine.
  */
 export interface AfterCreatedFunction {
@@ -151,11 +141,18 @@ export interface RoutineOptions extends BaseRoutineOptionsWithoutParameters {
 }
 
 export interface GeneratorOptions {
-  name: string;
-  option: MigrationOptionType;
-  modifiedFiles: string[];
-  custom: boolean;
+  migrationName: string;
+  databaseUnitType: DatabaseUnitType | "all";
+  updateLastMigration: boolean;
 }
+
+export interface DatabaseUnitMigration extends MigrationSqls {
+  build(): Promise<void>;
+}
+
+export type RoutineType = "function" | "trigger";
+
+export type DatabaseUnitType = RoutineType | "customField" | "extension";
 
 /** Type for the different options for the generate:migrations command. */
 export type MigrationOptionType =
