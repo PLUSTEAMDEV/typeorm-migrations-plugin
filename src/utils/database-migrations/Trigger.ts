@@ -26,25 +26,20 @@ export class Trigger {
     this.expression = this.buildExpression();
   }
 
-  clearAndUpper(text: string) {
-    return text.replace(/_/, "").toUpperCase();
-  }
   /**
    * This function import the migration functions of the routine that
    * the trigger executes.
    * It construct the path with the MIGRATION_ROUTES constant to know where the routine is.
    * @return The migration function object of the routine.
    */
-  getQueryRoutine(): MigrationFunctions {
-    const routineFileName = this.options.functionName.replace(
-      /(^\w|_\w)/g,
-      this.clearAndUpper
+  async getQueryRoutine(): Promise<MigrationFunctions> {
+    const importedRoutine = await import(
+      path.join(
+        MIGRATION_ROUTES.function.path,
+        this.options.functionName + ".ts"
+      )
     );
-    const importedRoutine = require(path.join(
-      MIGRATION_ROUTES.function.path,
-      routineFileName + ".ts"
-    )).default;
-    return importedRoutine.queryConstructor();
+    return importedRoutine.default.queryConstructor();
   }
 
   /**
@@ -53,9 +48,9 @@ export class Trigger {
    * Before create the trigger, we need to drop it if exists, and then create the routine that the trigger executes.
    * @return The migration function object of the trigger.
    */
-  queryConstructor(): MigrationFunctions {
+  async queryConstructor(): Promise<MigrationFunctions> {
     const dropTrigger = `DROP TRIGGER IF EXISTS ${this.options.triggerName} ON ${this.options.schema}.${this.options.tableName};`;
-    const queryRoutine = this.getQueryRoutine();
+    const queryRoutine = await this.getQueryRoutine();
     return {
       up: {
         beforeCreated: [
