@@ -101,7 +101,7 @@ export interface DatabaseUnit {
  * Represents a function to be applied after the creation of Routine.
  */
 export interface AfterCreatedFunction {
-  func: Function;
+  callback: Function;
   params: string[];
 }
 
@@ -147,7 +147,7 @@ export interface RoutineOptions extends BaseRoutineOptionsWithoutParameters {
   expression: (options: RoutineExpressionParameters) => string;
   afterCreated?: AfterCreatedFunction[];
   parameters?: DatabaseColumn[];
-  grantAccessToUsers?: boolean;
+  grantAccessToDefaultUsers?: boolean;
 }
 
 export interface GeneratorOptions {

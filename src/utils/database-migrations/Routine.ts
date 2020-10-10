@@ -9,18 +9,12 @@ import { grantAccessToRoutine } from "@/utils/database-migrations/utils";
 import { PostgresUtils } from "@/utils/database-migrations/PostgresUtils";
 
 export class Routine {
-  name: string;
-  expression: string;
-  beforeCreated: string;
-  afterCreated: AfterCreatedFunction[];
+  options: RoutineOptions;
   parameters: string;
-  schema: string;
-  grantAccessToUsers: boolean;
+  expression: string;
 
-  constructor(options: RoutineOptions) {
-    this.name = options.routineName;
-    const parameters = options.parameters || [];
-    this.parameters = parameters
+  buildParameters() {
+    return this.options.parameters
       .map(
         (parameter: DatabaseColumn) =>
           `${parameter.name}  ${PostgresUtils.createFullType(
@@ -29,20 +23,37 @@ export class Routine {
           )}`
       )
       .join(", ");
-    this.afterCreated = options.afterCreated || [];
-    this.schema = options.schema || DB_SCHEMA;
-    this.grantAccessToUsers = options.grantAccessToUsers || true;
-    if (this.grantAccessToUsers) {
-      this.afterCreated.push({
-        func: grantAccessToRoutine,
+  }
+
+  buildExpression() {
+    const { schema, routineName } = this.options;
+    return this.options.expression({
+      schema,
+      routineName,
+      parameters: this.parameters,
+    });
+  }
+
+  constructor(options: RoutineOptions) {
+    this.setOptions(options);
+    this.parameters = this.buildParameters();
+    this.expression = this.buildExpression();
+  }
+
+  setOptions(options: RoutineOptions) {
+    const defaultOptions = {
+      parameters: [],
+      afterCreated: [],
+      schema: DB_SCHEMA,
+      grantAccessToDefaultUsers: true,
+    };
+    this.options = Object.assign({}, defaultOptions, options);
+    if (this.options.grantAccessToDefaultUsers) {
+      this.options.afterCreated.push({
+        callback: grantAccessToRoutine,
         params: DB_USERS,
       });
     }
-    this.expression = options.expression({
-      schema: this.schema,
-      routineName: this.name,
-      parameters: this.parameters,
-    });
   }
 
   /**
@@ -65,14 +76,14 @@ export class Routine {
       up: {
         beforeCreated: [this.checkFunctionBodies(false)],
         create: `CREATE OR REPLACE ${this.expression}`,
-        afterCreated: this.afterCreated
+        afterCreated: this.options.afterCreated
           .map((option: AfterCreatedFunction) =>
-            option.func(this, option.params)
+            option.callback(this, option.params)
           )
           .join("\n"),
       },
       down: {
-        drop: `DROP FUNCTION IF EXISTS ${this.name};`,
+        drop: `DROP FUNCTION IF EXISTS ${this.options.routineName};`,
       },
     };
   }

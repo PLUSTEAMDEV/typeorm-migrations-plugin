@@ -6,28 +6,29 @@ import { MIGRATION_ROUTES, DB_SCHEMA } from "migrationsconfig";
 import * as path from "path";
 
 export class Trigger {
-  name: string;
+  options: TriggerOptions;
   expression: string;
-  tableName: string;
-  functionName: string;
-  schema: string;
 
-  constructor(options: TriggerOptions) {
-    this.name = options.triggerName;
-    this.tableName = options.tableName;
-    this.functionName = options.functionName;
-    this.schema = options.schema || DB_SCHEMA;
-    this.expression = options.expression({
-      schema: this.schema,
-      tableName: this.tableName,
-      functionName: this.functionName,
+  buildExpression() {
+    const { schema, tableName, functionName } = this.options;
+    return this.options.expression({
+      schema,
+      tableName,
+      functionName,
     });
   }
 
-  clearAndUpper(text) {
-    return text.replace(/_/, "").toUpperCase();
+  constructor(options: TriggerOptions) {
+    const defaultOptions = {
+      schema: DB_SCHEMA,
+    };
+    this.options = Object.assign({}, defaultOptions, options);
+    this.expression = this.buildExpression();
   }
 
+  clearAndUpper(text: string) {
+    return text.replace(/_/, "").toUpperCase();
+  }
   /**
    * This function import the migration functions of the routine that
    * the trigger executes.
@@ -35,7 +36,7 @@ export class Trigger {
    * @return The migration function object of the routine.
    */
   getQueryRoutine(): MigrationFunctions {
-    const routineFileName = this.functionName.replace(
+    const routineFileName = this.options.functionName.replace(
       /(^\w|_\w)/g,
       this.clearAndUpper
     );
@@ -53,7 +54,7 @@ export class Trigger {
    * @return The migration function object of the trigger.
    */
   queryConstructor(): MigrationFunctions {
-    const dropTrigger = `DROP TRIGGER IF EXISTS ${this.name} ON ${this.schema}.${this.tableName};`;
+    const dropTrigger = `DROP TRIGGER IF EXISTS ${this.options.triggerName} ON ${this.options.schema}.${this.options.tableName};`;
     const queryRoutine = this.getQueryRoutine();
     return {
       up: {
@@ -62,7 +63,7 @@ export class Trigger {
           queryRoutine.up.create,
           queryRoutine.up.afterCreated,
         ],
-        create: `CREATE TRIGGER ${this.name} ${this.expression}`,
+        create: `CREATE TRIGGER ${this.options.triggerName} ${this.expression}`,
       },
       down: {
         drop: dropTrigger,

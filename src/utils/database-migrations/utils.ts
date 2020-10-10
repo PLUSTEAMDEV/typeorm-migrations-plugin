@@ -43,7 +43,7 @@ export function grantAccessToRoutine(
   return users
     .map(
       (user: string) =>
-        `ALTER FUNCTION ${routine.schema}.${routine.name}(${routine.parameters}) OWNER TO "${user}";`
+        `ALTER FUNCTION ${routine.options.schema}.${routine.options.routineName}(${routine.options.parameters}) OWNER TO "${user}";`
     )
     .join("\n");
 }
