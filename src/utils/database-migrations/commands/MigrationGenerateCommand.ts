@@ -25,6 +25,7 @@ export class MigrationGenerateCommand implements yargs.CommandModule {
       })
       .option("update_last_migration", {
         default: "false",
+        alias: "updateLastMigration",
         describe: `Updates the last created migration instead of creating a new one 
                 possible values: 'true' or 'false'`,
       });

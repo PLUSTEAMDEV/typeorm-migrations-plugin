@@ -150,9 +150,9 @@ export interface DatabaseUnitMigration extends MigrationSqls {
   build(): Promise<void>;
 }
 
-export type RoutineType = "function" | "trigger";
+export type PsqlUnitType = "function" | "trigger";
 
-export type DatabaseUnitType = RoutineType | "customField" | "extension";
+export type DatabaseUnitType = PsqlUnitType | "customField" | "extension";
 
 /** Type for the different options for the generate:migrations command. */
 export type MigrationOptionType =

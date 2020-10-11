@@ -3,7 +3,7 @@ import {
   MigrationFunctions,
 } from "@/utils/database-migrations/interfaces";
 
-export default class RoutineMigration implements DatabaseUnitMigration {
+export class PsqlUnitMigration implements DatabaseUnitMigration {
   downSqls: string[] = [];
   upSqls: string[] = [];
   migrationFunctions: MigrationFunctions;
@@ -19,7 +19,7 @@ export default class RoutineMigration implements DatabaseUnitMigration {
     this.upSqls.push(up.create);
     this.downSqls.push(down.drop);
 
-    up.beforeCreated && this.upSqls.push(up.afterCreated);
+    up.afterCreated && this.upSqls.push(up.afterCreated);
     down.afterDrop && this.downSqls.push(down.afterDrop);
   }
 }

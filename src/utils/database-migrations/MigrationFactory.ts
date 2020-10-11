@@ -1,34 +1,40 @@
 import {
   DatabaseUnitMigration,
   DatabaseUnitType,
-  RoutineType,
+  PsqlUnitType,
 } from "@/utils/database-migrations/interfaces";
 import { CUSTOM_FIELDS, EXTENSIONS } from "migrationsconfig";
 import { ExtensionMigration } from "@/utils/database-migrations/database-unit-migration/ExtensionMigration";
 import { CustomFieldMigration } from "@/utils/database-migrations/database-unit-migration/CustomFieldMigration";
 import { MigrationUtils } from "@/utils/database-migrations/MigrationUtils";
-import RoutineMigration from "@/utils/database-migrations/database-unit-migration/RoutineMigration";
+import { PsqlUnitMigration } from "@/utils/database-migrations/database-unit-migration/PsqlUnitMigration";
 
 export class MigrationFactory {
-  private static async getCustomFieldMigrations(): Promise<DatabaseUnitMigration[]> {
+  private static async getExtensionMigrations(): Promise<
+    DatabaseUnitMigration[]
+  > {
     return EXTENSIONS.map((extension) => new ExtensionMigration(extension));
   }
 
-  private static async getExtensionMigrations(): Promise<DatabaseUnitMigration[]> {
+  private static async getCustomFieldMigrations(): Promise<
+    DatabaseUnitMigration[]
+  > {
     return CUSTOM_FIELDS.map(
       (customField) => new CustomFieldMigration(customField)
     );
   }
 
-  private static async getRoutineMigrations(
-    routineType: RoutineType
+  private static async getPsqlUnitMigrations(
+    psqlUnitType: PsqlUnitType
   ): Promise<DatabaseUnitMigration[]> {
-    const changedFiles = MigrationUtils.getRoutineChangedFiles(routineType);
+    const changedFiles = MigrationUtils.getPsqlUnitTypeChangedFiles(
+      psqlUnitType
+    );
     const databaseUnitMigrations: DatabaseUnitMigration[] = [];
     for (const changedFile of changedFiles) {
-      const importedRoutine = await import(changedFile);
-      const migrationFunction = importedRoutine.default.queryConstructor();
-      databaseUnitMigrations.push(new RoutineMigration(migrationFunction));
+      const importedPsqlUnit = await import(changedFile);
+      const migrationFunction = await importedPsqlUnit.default.queryConstructor();
+      databaseUnitMigrations.push(new PsqlUnitMigration(migrationFunction));
     }
     return databaseUnitMigrations;
   }
@@ -42,8 +48,8 @@ export class MigrationFactory {
     > = {
       extension: MigrationFactory.getExtensionMigrations,
       customField: MigrationFactory.getCustomFieldMigrations,
-      trigger: MigrationFactory.getRoutineMigrations.bind(null, "trigger"),
-      function: MigrationFactory.getRoutineMigrations.bind(null, "function"),
+      trigger: MigrationFactory.getPsqlUnitMigrations.bind(null, "trigger"),
+      function: MigrationFactory.getPsqlUnitMigrations.bind(null, "function"),
     };
     const databaseUnitMigrations = [];
     for (const databaseUnitType of databaseUnitTypes) {

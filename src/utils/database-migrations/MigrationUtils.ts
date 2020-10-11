@@ -3,7 +3,7 @@ import * as fs from "fs";
 import {
   MigrationFileContent,
   MigrationSqls,
-  RoutineType,
+  PsqlUnitType,
 } from "@/utils/database-migrations/interfaces";
 import { MIGRATION_ROUTES, MIGRATIONS_PATH } from "migrationsconfig";
 import { format } from "@sqltools/formatter/lib/sqlFormatter";
@@ -58,11 +58,11 @@ export class ${name}${timestamp} implements MigrationInterface {
     return "\n" + formattedQuery.replace(/^/gm, "            ") + "\n        ";
   }
 
-  static getRoutineChangedFiles(routineType: RoutineType) {
-    const isExpectedRoutineType = (filename: string) =>
-      filename.includes(MIGRATION_ROUTES[routineType].path);
+  static getPsqlUnitTypeChangedFiles(psqlUnitType: PsqlUnitType) {
+    const isExpectedPsqlUnitType = (filename: string) =>
+      filename.includes(MIGRATION_ROUTES[psqlUnitType].path);
     return GitChangedFilesDetector.getChangedFiles().filter((filename) =>
-      isExpectedRoutineType(filename)
+      isExpectedPsqlUnitType(filename)
     );
   }
 
@@ -70,7 +70,7 @@ export class ${name}${timestamp} implements MigrationInterface {
     migrationsSqls: MigrationSqls
   ): MigrationFileContent {
     const formatSqlToQueryRunnerSentence = (query: string) =>
-      `\tawait queryRunner.query(\`${this.prettifyQuery(query)}\`);\n`;
+      `\t\t\t\tawait queryRunner.query(\`${this.prettifyQuery(query)}\`);\n`;
     let up: string = "";
     let down: string = "";
     for (const upSql of migrationsSqls.upSqls) {
