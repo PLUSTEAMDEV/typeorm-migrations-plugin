@@ -149,6 +149,11 @@ export interface GeneratorOptions {
   updateLastMigration: boolean;
 }
 
+export interface GetDatabaseUnitOptions {
+  databaseUnitName: string;
+  databaseUnitType: DatabaseUnitType;
+}
+
 export interface DatabaseUnitMigration extends MigrationSqls {
   build(): Promise<void>;
 }

@@ -59,3 +59,10 @@ npm run apply:migrations
 ```
 npm run revert:migrations 
 ```
+
+`database:unit --db_unit --unit_name` : returns the current create query of a database unit (trigger, function, procedure).
+- Examples:
+```
+npm run database:unit -- function --unit_name check_parent
+npm run database:unit -- trigger --unit_name update_validate_import
+```
