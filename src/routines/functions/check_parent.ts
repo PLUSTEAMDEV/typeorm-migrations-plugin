@@ -31,6 +31,7 @@ const expression = ({ schema, routineName, parameters }): string => `
 //TODO: #CU-2943qg Migrations - Routines logic abstraction
 export default new Routine({
   routineName: "check_parent",
+  routineType: "function",
   expression,
   schema: DB_SCHEMA,
 });

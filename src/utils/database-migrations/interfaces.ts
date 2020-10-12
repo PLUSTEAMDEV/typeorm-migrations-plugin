@@ -130,6 +130,8 @@ type BaseRoutineOptionsWithoutParameters = Omit<
   "parameters"
 >;
 
+export type RoutineType = "function" | "procedure";
+
 export interface RoutineOptions extends BaseRoutineOptionsWithoutParameters {
   /** The SQl sentence for create the routine.
    * It is all the expression after the 'CREATE OR REPLACE'
@@ -138,6 +140,7 @@ export interface RoutineOptions extends BaseRoutineOptionsWithoutParameters {
   afterCreated?: AfterCreatedFunction[];
   parameters?: DatabaseColumn[];
   grantAccessToDefaultUsers?: boolean;
+  routineType: RoutineType;
 }
 
 export interface GeneratorOptions {
@@ -150,7 +153,7 @@ export interface DatabaseUnitMigration extends MigrationSqls {
   build(): Promise<void>;
 }
 
-export type PsqlUnitType = "function" | "trigger";
+export type PsqlUnitType = RoutineType | "trigger";
 
 export type DatabaseUnitType = PsqlUnitType | "customField" | "extension";
 

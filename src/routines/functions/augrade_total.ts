@@ -125,6 +125,7 @@ const expression = ({ schema, routineName, parameters }): string => `
 
 export default new Routine({
   routineName: "augrade_total",
+  routineType: "function",
   expression,
   parameters: [
     {

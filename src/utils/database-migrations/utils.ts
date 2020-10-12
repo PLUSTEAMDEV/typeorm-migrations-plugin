@@ -25,12 +25,12 @@ const writeFilePromise = util.promisify(fs.writeFile);
  * @return a promise when the file is created.
  */
 export async function createFile(
-    filePath: string,
-    content: string,
-    override: boolean = true
+  filePath: string,
+  content: string,
+  override: boolean = true
 ): Promise<void> {
   await mkdirp(path.dirname(filePath));
-  if(override) {
+  if (override) {
     await writeFilePromise(filePath, content);
   }
 }
@@ -67,7 +67,11 @@ export function grantAccessToRoutine(
   return users
     .map(
       (user: string) =>
-        `ALTER FUNCTION ${routine.options.schema}.${routine.options.routineName}(${routine.parameters}) OWNER TO "${user}";`
+        `ALTER ${routine.options.routineType.toUpperCase()} ${
+          routine.options.schema
+        }.${routine.options.routineName}(${
+          routine.parameters
+        }) OWNER TO "${user}";`
     )
     .join("\n");
 }

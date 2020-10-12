@@ -11,6 +11,9 @@ export const MIGRATION_ROUTES = {
   function: {
     path: "src/routines/functions",
   },
+  procedure: {
+    path: "src/routines/procedures",
+  },
   trigger: {
     path: "triggers",
   },

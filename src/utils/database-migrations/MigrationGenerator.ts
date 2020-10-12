@@ -29,7 +29,7 @@ export class MigrationGenerator {
     this.options = Object.assign({}, defaultOptions, options);
     this.databaseUnitTypes =
       options.databaseUnitType === "all"
-        ? ["function", "trigger", "customField", "extension"]
+        ? ["function", "procedure", "trigger", "customField", "extension"]
         : [options.databaseUnitType];
   }
 

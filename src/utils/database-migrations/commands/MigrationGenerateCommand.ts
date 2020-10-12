@@ -17,7 +17,7 @@ export class MigrationGenerateCommand implements yargs.CommandModule {
       .option("db_unit", {
         alias: "unit",
         describe: `Database unit type to generate a migration, 
-                possible values: 'all', 'trigger', 'function' or 'extension'`,
+                possible values: 'all', 'trigger', 'function', 'procedure' or 'extension'`,
       })
       .option("migration_name", {
         alias: "name",

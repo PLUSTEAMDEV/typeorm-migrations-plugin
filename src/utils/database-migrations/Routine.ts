@@ -83,7 +83,9 @@ export class Routine {
           .join("\n"),
       },
       down: {
-        drop: `DROP FUNCTION IF EXISTS ${this.options.routineName};`,
+        drop: `DROP ${this.options.routineType.toUpperCase()} IF EXISTS ${
+          this.options.routineName
+        };`,
       },
     };
   }

@@ -30,6 +30,7 @@ const expression = ({ schema, routineName, parameters }): string => `
 
 export default new Routine({
   routineName: "update_validate_import",
+  routineType: "function",
   expression,
   schema: DB_SCHEMA,
 });

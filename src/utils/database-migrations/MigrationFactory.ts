@@ -50,6 +50,7 @@ export class MigrationFactory {
       customField: MigrationFactory.getCustomFieldMigrations,
       trigger: MigrationFactory.getPsqlUnitMigrations.bind(null, "trigger"),
       function: MigrationFactory.getPsqlUnitMigrations.bind(null, "function"),
+      procedure: MigrationFactory.getPsqlUnitMigrations.bind(null, "procedure"),
     };
     const databaseUnitMigrations = [];
     for (const databaseUnitType of databaseUnitTypes) {
