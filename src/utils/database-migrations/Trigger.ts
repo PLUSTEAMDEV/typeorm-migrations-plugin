@@ -42,6 +42,14 @@ export class Trigger {
     return importedRoutine.default.queryConstructor();
   }
 
+  getCreateStatement(): string {
+    return `CREATE TRIGGER ${this.options.triggerName} ${this.expression}`;
+  }
+
+  getName(): string {
+    return this.options.triggerName;
+  }
+
   /**
    * Construct the migration functions (up and down) with the queries to create and drop the trigger
    * the beforeCreated, the create and the drop set of queries for the migrations.
@@ -58,7 +66,7 @@ export class Trigger {
           queryRoutine.up.create,
           queryRoutine.up.afterCreated,
         ],
-        create: `CREATE TRIGGER ${this.options.triggerName} ${this.expression}`,
+        create: this.getCreateStatement(),
       },
       down: {
         drop: dropTrigger,

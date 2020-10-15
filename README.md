@@ -66,3 +66,10 @@ npm run revert:migrations
 npm run database:unit -- function --unit_name check_parent
 npm run database:unit -- trigger --unit_name update_validate_import
 ```
+
+`build:units --directory` : Creates a directory with .sql files for each PsqlUnits (trigger, function, procedure).
+- Examples:
+``
+npm run database:unit 
+npm run database:unit --directory sql-files
+```

@@ -16,25 +16,30 @@ import * as util from "util";
 import * as fs from "fs";
 
 const writeFilePromise = util.promisify(fs.writeFile);
-/**
- * Function to know if the structure is in a migration route.
- * With the 'all' option it takes triggers and functions routes.
- * @param filePath Filepath to the directory.
- * @param content Content of the file.
- * @param override Override option to know if overrides the file.
- * @return a promise when the file is created.
- */
+
+export async function createDirectory(directoryPath: string): Promise<void> {
+  await mkdirp(directoryPath);
+}
+
 export async function createFile(
   filePath: string,
   content: string,
   override: boolean = true
 ): Promise<void> {
-  await mkdirp(path.dirname(filePath));
+  await createDirectory(path.dirname(filePath));
   if (override) {
     await writeFilePromise(filePath, content);
   }
 }
 
+export function getFilteredFilesFromPath(
+  filePath: string,
+  extension: string
+): string[] {
+  return fs
+    .readdirSync(filePath)
+    .filter((file: string) => file.endsWith("." + extension));
+}
 /**
  * Construct the query to create and drop the extension.
  * @param extension Extension object.

@@ -5,9 +5,14 @@ import {
   MigrationSqls,
   PsqlUnitType,
 } from "@/utils/database-migrations/interfaces";
-import { MIGRATION_ROUTES, MIGRATIONS_PATH } from "migrationsconfig";
+import {
+  ENTITIES_PATH,
+  MIGRATION_ROUTES,
+  MIGRATIONS_PATH,
+} from "migrationsconfig";
 import { format } from "@sqltools/formatter/lib/sqlFormatter";
 import { GitChangedFilesDetector } from "@/utils/database-migrations/GitChangedFilesDetector";
+import { getFilteredFilesFromPath } from "@/utils/database-migrations/utils";
 
 export class MigrationUtils {
   /**
@@ -64,6 +69,52 @@ export class ${name}${timestamp} implements MigrationInterface {
     return GitChangedFilesDetector.getChangedFiles().filter((filename) =>
       isExpectedPsqlUnitType(filename)
     );
+  }
+
+  static getTriggersPaths(): string[] {
+    const triggerPaths: string[] = [];
+    const entitiesDirectories = fs.readdirSync(ENTITIES_PATH);
+    for (let directory of entitiesDirectories) {
+      const triggersDirectory = path.join(
+        ENTITIES_PATH,
+        directory,
+        MIGRATION_ROUTES.trigger.path
+      );
+      if (fs.existsSync(triggersDirectory)) {
+        const files = getFilteredFilesFromPath(triggersDirectory, "ts");
+        files.forEach((file: string) =>
+          triggerPaths.push(path.join(triggersDirectory, file))
+        );
+      }
+    }
+    return triggerPaths;
+  }
+
+  static getRoutinesPaths(psqlUnitType: PsqlUnitType): string[] {
+    let routinesPaths: string[] = [];
+    const files = getFilteredFilesFromPath(
+      MIGRATION_ROUTES[psqlUnitType].path,
+      "ts"
+    );
+    files.forEach((file: string) =>
+      routinesPaths.push(path.join(MIGRATION_ROUTES[psqlUnitType].path, file))
+    );
+    return routinesPaths;
+  }
+
+  static async getPsqlUnitTypePaths(): Promise<string[]> {
+    let psqlUnitPaths = [];
+    const getUnitPathsMap: Record<PsqlUnitType, () => Promise<string[]>> = {
+      trigger: MigrationUtils.getTriggersPaths.bind(null),
+      function: MigrationUtils.getRoutinesPaths.bind(null, "function"),
+      procedure: MigrationUtils.getRoutinesPaths.bind(null, "procedure"),
+    };
+    const psqlUnitTypes: PsqlUnitType[] = ["trigger", "function", "procedure"];
+    for (const unit of psqlUnitTypes) {
+      const unitsPaths = await getUnitPathsMap[unit];
+      psqlUnitPaths.push(...(await unitsPaths()));
+    }
+    return psqlUnitPaths;
   }
 
   static buildMigrationContent(

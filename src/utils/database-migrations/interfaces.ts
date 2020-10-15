@@ -6,6 +6,8 @@ import {
 import { ColumnCommonOptions } from "typeorm/decorator/options/ColumnCommonOptions";
 import { ColumnWithLengthOptions } from "typeorm/decorator/options/ColumnWithLengthOptions";
 import { ColumnNumericOptions } from "typeorm/decorator/options/ColumnNumericOptions";
+import { Trigger } from "@/utils/database-migrations/Trigger";
+import { Routine } from "@/utils/database-migrations/Routine";
 
 interface CreateStructure {
   /** Array of queries to execute before create the structure in the database. */
@@ -154,11 +156,17 @@ export interface GetDatabaseUnitOptions {
   databaseUnitType: DatabaseUnitType;
 }
 
+export interface BuildPsqlUnitOptions {
+  directory: string;
+}
+
 export interface DatabaseUnitMigration extends MigrationSqls {
   build(): Promise<void>;
 }
 
 export type PsqlUnitType = RoutineType | "trigger";
+
+export type PsqlUnitTypeClass = Trigger | Routine;
 
 export type DatabaseUnitType = PsqlUnitType | "customField" | "extension";
 

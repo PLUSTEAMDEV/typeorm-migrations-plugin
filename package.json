@@ -38,6 +38,7 @@
       "apply:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run",
       "revert:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert",
       "database:unit": "ts-node -r tsconfig-paths/register src/cli database:unit --db_unit",
+      "build:units": "ts-node -r tsconfig-paths/register src/cli build:units --directory",
       "docs": "typedoc --options typedocs.json",
       "postdocs": "http-server ./docs",
       "changes": "ts-node -r tsconfig-paths/register src/utils/database-migrations/GitChangedFilesDetector.ts"

@@ -65,6 +65,13 @@ export class Routine {
     return `SET check_function_bodies = ${check};`;
   }
 
+  getCreateStatement(): string {
+    return `CREATE OR REPLACE ${this.expression}`;
+  }
+
+  getName(): string {
+    return this.options.routineName;
+  }
   /**
    * Construct the migration functions (up and down) with the queries to create and drop the routine.
    * In the beforeCreated, disable the check function body option to create the function.
@@ -75,7 +82,7 @@ export class Routine {
     return {
       up: {
         beforeCreated: [this.checkFunctionBodies(false)],
-        create: `CREATE OR REPLACE ${this.expression}`,
+        create: this.getCreateStatement(),
         afterCreated: this.options.afterCreated
           .map((option: AfterCreatedFunction) =>
             option.callback(this, option.params)

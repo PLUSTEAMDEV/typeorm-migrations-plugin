@@ -7,6 +7,8 @@ const { DB_USER, DB_PUBLIC_SCHEMA } = process.env;
 
 export const MIGRATIONS_PATH = "src/migration";
 
+export const ENTITIES_PATH = "src/entity";
+
 export const MIGRATION_ROUTES = {
   function: {
     path: "src/routines/functions",

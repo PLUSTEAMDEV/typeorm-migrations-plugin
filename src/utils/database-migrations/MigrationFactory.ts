@@ -1,7 +1,9 @@
 import {
   DatabaseUnitMigration,
   DatabaseUnitType,
+  MigrationFunctions,
   PsqlUnitType,
+  PsqlUnitTypeClass,
 } from "@/utils/database-migrations/interfaces";
 import { CUSTOM_FIELDS, EXTENSIONS } from "migrationsconfig";
 import { ExtensionMigration } from "@/utils/database-migrations/database-unit-migration/ExtensionMigration";
@@ -24,6 +26,30 @@ export class MigrationFactory {
     );
   }
 
+  static async getPsqlUnitsFromFiles(
+    files: string[]
+  ): Promise<PsqlUnitTypeClass[]> {
+    const psqlUnits: PsqlUnitTypeClass[] = [];
+    for (const file of files) {
+      const importedPsqlUnit = await import(file);
+      const psqlUnit = await importedPsqlUnit.default;
+      psqlUnits.push(psqlUnit);
+    }
+    return psqlUnits;
+  }
+
+  static async getMigrationsFunctionsFromFiles(
+    files: string[]
+  ): Promise<MigrationFunctions[]> {
+    const migrationFunctions: MigrationFunctions[] = [];
+    const psqlUnits = await this.getPsqlUnitsFromFiles(files);
+    for (const psqlUnit of psqlUnits) {
+      const migrationFunction = await psqlUnit.queryConstructor();
+      migrationFunctions.push(migrationFunction);
+    }
+    return migrationFunctions;
+  }
+
   private static async getPsqlUnitMigrations(
     psqlUnitType: PsqlUnitType
   ): Promise<DatabaseUnitMigration[]> {
@@ -31,9 +57,10 @@ export class MigrationFactory {
       psqlUnitType
     );
     const databaseUnitMigrations: DatabaseUnitMigration[] = [];
-    for (const changedFile of changedFiles) {
-      const importedPsqlUnit = await import(changedFile);
-      const migrationFunction = await importedPsqlUnit.default.queryConstructor();
+    const migrationFunctions = await MigrationFactory.getMigrationsFunctionsFromFiles(
+      changedFiles
+    );
+    for (const migrationFunction of migrationFunctions) {
       databaseUnitMigrations.push(new PsqlUnitMigration(migrationFunction));
     }
     return databaseUnitMigrations;
