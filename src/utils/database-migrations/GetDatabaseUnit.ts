@@ -16,10 +16,10 @@ export class GetDatabaseUnit {
   databaseUnitPathConstructor(): string {
     let databaseUnitPath = "";
     if (this.options.databaseUnitType == "trigger") {
-      const entitiesDirectories = fs.readdirSync("src/entity");
+      const entitiesDirectories = fs.readdirSync(CONFIG.ENTITIES_PATH);
       for (let directory of entitiesDirectories) {
         const triggersDirectory = path.join(
-          "src/entity",
+          CONFIG.ENTITIES_PATH,
           directory,
           CONFIG.MIGRATION_ROUTES.trigger.path
         );
