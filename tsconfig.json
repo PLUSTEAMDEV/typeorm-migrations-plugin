@@ -10,13 +10,17 @@
          "@root/*": ["."]
       },
       "target": "es2017",
+      "declaration": true,
       "module": "commonjs",
       "moduleResolution": "node",
-      "outDir": "./build",
+      "outDir": "./dist",
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
       "sourceMap": true,
       "allowJs": true,
       "resolveJsonModule": true
-   }
+   },
+   "include": [
+      "src/**/*.ts"
+   ]
 }
