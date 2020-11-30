@@ -5,7 +5,7 @@
 import * as yargs from "yargs";
 import { DatabaseUnitType } from "@/utils/database-migrations/interfaces";
 import { MigrationGenerator } from "@/utils/database-migrations/MigrationGenerator";
-//TODO: #CU-2943qg Migrations - Convert the custom migration system to a npm package
+import * as fs from "fs";
 
 export class MigrationGenerateCommand implements yargs.CommandModule {
   command = "migration:generate";
@@ -23,6 +23,10 @@ export class MigrationGenerateCommand implements yargs.CommandModule {
         alias: "name",
         describe: `Name of the migration to be generated.'`,
       })
+      .option("config_route", {
+        alias: "config",
+        describe: "Route to the config file.",
+      })
       .option("update_last_migration", {
         default: "false",
         alias: "updateLastMigration",
@@ -32,6 +36,12 @@ export class MigrationGenerateCommand implements yargs.CommandModule {
   }
 
   async handler(args: yargs.Arguments) {
+    const MIGRATION_CONFIG = await import(
+      `${process.cwd()}/migrationsconfig.ts`
+    );
+    if (!MIGRATION_CONFIG)
+      throw new Error("Missing migrations configuration file.");
+    fs.writeFileSync("migrationsconfig.json", JSON.stringify(MIGRATION_CONFIG));
     const generator = new MigrationGenerator({
       migrationName: args.name as string,
       databaseUnitType: args.unit as DatabaseUnitType | "all",

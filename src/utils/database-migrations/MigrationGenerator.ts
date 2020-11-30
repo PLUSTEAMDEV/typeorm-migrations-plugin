@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { MIGRATIONS_PATH } from "migrationsconfig";
+import * as CONFIG from "migrationsconfig.json";
 import { createFile } from "@/utils/database-migrations/utils";
 import {
   MigrationSqls,
@@ -48,7 +48,7 @@ export class MigrationGenerator {
         content
       );
       const filename = timestamp + "-" + this.options.migrationName + ".ts";
-      let directory = MIGRATIONS_PATH;
+      let directory = CONFIG.MIGRATIONS_PATH;
       const filePath = path.join(
         process.cwd(),
         directory ? directory + "/" : "",
@@ -76,19 +76,19 @@ export class MigrationGenerator {
     migrationSqls: MigrationSqls
   ): Promise<void> {
     const fileData = fs
-      .readFileSync(path.join(MIGRATIONS_PATH, fileName))
+      .readFileSync(path.join(CONFIG.MIGRATIONS_PATH, fileName))
       .toString();
     const lines = fileData.split("\n");
     const content = MigrationUtils.buildMigrationContent(migrationSqls);
     lines.splice(6, 0, "        " + content.up);
     lines.splice(lines.length - 4, 0, "        " + content.down);
     const unitedData = lines.join("\n");
-    fs.writeFileSync(path.join(MIGRATIONS_PATH, fileName), unitedData);
+    fs.writeFileSync(path.join(CONFIG.MIGRATIONS_PATH, fileName), unitedData);
     const partsFileName = fileName.split("-");
     const newFileName = `${partsFileName[0]}-${this.options.migrationName}.ts`;
     fs.renameSync(
-      path.join(MIGRATIONS_PATH, fileName),
-      path.join(MIGRATIONS_PATH, newFileName)
+      path.join(CONFIG.MIGRATIONS_PATH, fileName),
+      path.join(CONFIG.MIGRATIONS_PATH, newFileName)
     );
   }
 

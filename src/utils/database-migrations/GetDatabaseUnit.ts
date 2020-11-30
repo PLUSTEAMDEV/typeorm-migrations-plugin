@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { MIGRATION_ROUTES } from "migrationsconfig";
+import * as CONFIG from "migrationsconfig.json";
 import {
   GetDatabaseUnitOptions,
   MigrationFunctions,
@@ -21,7 +21,7 @@ export class GetDatabaseUnit {
         const triggersDirectory = path.join(
           "src/entity",
           directory,
-          MIGRATION_ROUTES.trigger.path
+          CONFIG.MIGRATION_ROUTES.trigger.path
         );
         if (fs.existsSync(triggersDirectory)) {
           const files = fs.readdirSync(triggersDirectory);
@@ -38,7 +38,7 @@ export class GetDatabaseUnit {
       }
     } else {
       databaseUnitPath = path.join(
-        MIGRATION_ROUTES[this.options.databaseUnitType].path,
+        CONFIG.MIGRATION_ROUTES[this.options.databaseUnitType].path,
         this.options.databaseUnitName + ".ts"
       );
     }

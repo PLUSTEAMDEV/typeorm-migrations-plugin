@@ -7,7 +7,7 @@ import {
   DatabaseExtension,
   MigrationFunctions,
 } from "@/utils/database-migrations/interfaces";
-import { EXTENSIONS } from "migrationsconfig";
+import * as CONFIG from "migrationsconfig.json";
 import { Routine } from "@/utils/database-migrations/Routine";
 import { execSync } from "child_process";
 import * as mkdirp from "mkdirp";
@@ -140,4 +140,6 @@ export function getLinesFromCommand(command: string) {
   return execSync(command).toString().split("\n");
 }
 
-export const CONSTRUCTED_EXTENSIONS = EXTENSIONS.map(extensionConstructor);
+export const CONSTRUCTED_EXTENSIONS = CONFIG.EXTENSIONS.map(
+  extensionConstructor
+);

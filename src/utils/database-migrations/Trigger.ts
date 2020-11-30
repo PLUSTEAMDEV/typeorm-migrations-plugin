@@ -2,7 +2,7 @@ import {
   MigrationFunctions,
   TriggerOptions,
 } from "@/utils/database-migrations/interfaces";
-import { MIGRATION_ROUTES, DB_SCHEMA } from "migrationsconfig";
+import * as CONFIG from "migrationsconfig.json";
 import * as path from "path";
 
 export class Trigger {
@@ -20,7 +20,7 @@ export class Trigger {
 
   constructor(options: TriggerOptions) {
     const defaultOptions = {
-      schema: DB_SCHEMA,
+      schema: CONFIG.DB_SCHEMA,
     };
     this.options = Object.assign({}, defaultOptions, options);
     this.expression = this.buildExpression();
@@ -35,7 +35,7 @@ export class Trigger {
   async getQueryRoutine(): Promise<MigrationFunctions> {
     const importedRoutine = await import(
       path.join(
-        MIGRATION_ROUTES.function.path,
+        CONFIG.MIGRATION_ROUTES.function.path,
         this.options.functionName + ".ts"
       )
     );

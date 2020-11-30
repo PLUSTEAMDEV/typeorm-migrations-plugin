@@ -5,7 +5,7 @@ import {
   PsqlUnitType,
   PsqlUnitTypeClass,
 } from "@/utils/database-migrations/interfaces";
-import { CUSTOM_FIELDS, EXTENSIONS } from "migrationsconfig";
+import * as CONFIG from "migrationsconfig.json";
 import { ExtensionMigration } from "@/utils/database-migrations/database-unit-migration/ExtensionMigration";
 import { CustomFieldMigration } from "@/utils/database-migrations/database-unit-migration/CustomFieldMigration";
 import { MigrationUtils } from "@/utils/database-migrations/MigrationUtils";
@@ -15,13 +15,15 @@ export class MigrationFactory {
   private static async getExtensionMigrations(): Promise<
     DatabaseUnitMigration[]
   > {
-    return EXTENSIONS.map((extension) => new ExtensionMigration(extension));
+    return CONFIG.EXTENSIONS.map(
+      (extension) => new ExtensionMigration(extension)
+    );
   }
 
   private static async getCustomFieldMigrations(): Promise<
     DatabaseUnitMigration[]
   > {
-    return CUSTOM_FIELDS.map(
+    return CONFIG.CUSTOM_FIELDS.map(
       (customField) => new CustomFieldMigration(customField)
     );
   }

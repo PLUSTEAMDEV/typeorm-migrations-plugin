@@ -5,11 +5,7 @@ import {
   MigrationSqls,
   PsqlUnitType,
 } from "@/utils/database-migrations/interfaces";
-import {
-  ENTITIES_PATH,
-  MIGRATION_ROUTES,
-  MIGRATIONS_PATH,
-} from "migrationsconfig";
+import * as CONFIG from "migrationsconfig.json";
 import { format } from "@sqltools/formatter/lib/sqlFormatter";
 import { GitChangedFilesDetector } from "@/utils/database-migrations/GitChangedFilesDetector";
 import { getFilteredFilesFromPath } from "@/utils/database-migrations/utils";
@@ -46,7 +42,7 @@ export class ${name}${timestamp} implements MigrationInterface {
    */
   //TODO: #CU-2943u4 Improve the process of the most recent migration file
   static async getMostRecentMigrationFile(): Promise<string> {
-    let dir = path.resolve(MIGRATIONS_PATH);
+    let dir = path.resolve(CONFIG.MIGRATIONS_PATH);
     let files = fs.readdirSync(dir);
     return files[files.length - 1].includes("all-migrations")
       ? files[files.length - 1]
@@ -65,7 +61,7 @@ export class ${name}${timestamp} implements MigrationInterface {
 
   static getPsqlUnitTypeChangedFiles(psqlUnitType: PsqlUnitType) {
     const isExpectedPsqlUnitType = (filename: string) =>
-      filename.includes(MIGRATION_ROUTES[psqlUnitType].path);
+      filename.includes(CONFIG.MIGRATION_ROUTES[psqlUnitType].path);
     return GitChangedFilesDetector.getChangedFiles().filter((filename) =>
       isExpectedPsqlUnitType(filename)
     );
@@ -73,12 +69,12 @@ export class ${name}${timestamp} implements MigrationInterface {
 
   static getTriggersPaths(): string[] {
     const triggerPaths: string[] = [];
-    const entitiesDirectories = fs.readdirSync(ENTITIES_PATH);
+    const entitiesDirectories = fs.readdirSync(CONFIG.ENTITIES_PATH);
     for (let directory of entitiesDirectories) {
       const triggersDirectory = path.join(
-        ENTITIES_PATH,
+        CONFIG.ENTITIES_PATH,
         directory,
-        MIGRATION_ROUTES.trigger.path
+        CONFIG.MIGRATION_ROUTES.trigger.path
       );
       if (fs.existsSync(triggersDirectory)) {
         const files = getFilteredFilesFromPath(triggersDirectory, "ts");
@@ -93,11 +89,13 @@ export class ${name}${timestamp} implements MigrationInterface {
   static getRoutinesPaths(psqlUnitType: PsqlUnitType): string[] {
     let routinesPaths: string[] = [];
     const files = getFilteredFilesFromPath(
-      MIGRATION_ROUTES[psqlUnitType].path,
+      CONFIG.MIGRATION_ROUTES[psqlUnitType].path,
       "ts"
     );
     files.forEach((file: string) =>
-      routinesPaths.push(path.join(MIGRATION_ROUTES[psqlUnitType].path, file))
+      routinesPaths.push(
+        path.join(CONFIG.MIGRATION_ROUTES[psqlUnitType].path, file)
+      )
     );
     return routinesPaths;
   }

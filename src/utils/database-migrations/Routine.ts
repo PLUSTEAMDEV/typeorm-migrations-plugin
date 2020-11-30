@@ -4,7 +4,7 @@ import {
   RoutineOptions,
   DatabaseColumn,
 } from "@/utils/database-migrations/interfaces";
-import { DB_SCHEMA, DB_USERS } from "migrationsconfig";
+import * as CONFIG from "migrationsconfig.json";
 import { grantAccessToRoutine } from "@/utils/database-migrations/utils";
 import { PostgresUtils } from "@/utils/database-migrations/PostgresUtils";
 
@@ -44,14 +44,14 @@ export class Routine {
     const defaultOptions = {
       parameters: [],
       afterCreated: [],
-      schema: DB_SCHEMA,
+      schema: CONFIG.DB_SCHEMA,
       grantAccessToDefaultUsers: true,
     };
     this.options = Object.assign({}, defaultOptions, options);
     if (this.options.grantAccessToDefaultUsers) {
       this.options.afterCreated.push({
         callback: grantAccessToRoutine,
-        params: DB_USERS,
+        params: CONFIG.DB_USERS,
       });
     }
   }
