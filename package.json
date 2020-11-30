@@ -3,6 +3,8 @@
    "version": "0.0.1",
    "description": "A database migrations tool for PostgreSQL in Node",
    "types": "dist/index.d.ts",
+   "main": "index.js",
+   "files": ["dist"],
    "devDependencies": {
       "@types/node": "^8.0.29",
       "@types/yargs": "^15.0.7",
