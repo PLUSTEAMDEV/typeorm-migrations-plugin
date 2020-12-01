@@ -3,15 +3,44 @@
    "version": "0.0.1",
    "description": "Awesome project developed with TypeORM.",
    "devDependencies": {
-      "ts-node": "3.3.0",
       "@types/node": "^8.0.29",
-      "typescript": "3.3.3333"
+      "@types/yargs": "^15.0.7",
+      "@typescript-eslint/eslint-plugin": "^3.10.1",
+      "@typescript-eslint/parser": "^3.10.1",
+      "eslint": "^7.7.0",
+      "eslint-config-prettier": "^6.11.0",
+      "eslint-plugin-prettier": "^3.1.4",
+      "http-server": "^0.12.3",
+      "prettier": "^2.1.1",
+      "typedoc": "^0.19.2"
    },
    "dependencies": {
+      "@sqltools/formatter": "^1.2.2",
+      "dotenv": "^8.2.0",
+      "pg": "^8.3.3",
+      "reflect-metadata": "^0.1.10",
+      "ts-node": "^9.0.0",
+      "tsconfig-paths": "^3.9.0",
       "typeorm": "0.2.25",
-      "reflect-metadata": "^0.1.10"
+      "typescript": "^4.0.2",
+      "yargs": "^16.0.3"
    },
    "scripts": {
-      "start": "ts-node src/index.ts"
+      "services:db": "docker-compose -f docker-compose.yaml up -d test-db",
+      "create:migration:file": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:create -n",
+      "generate:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -n",
+      "pregenerate:migrations:all": "ts-node -r ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -n all-migrations",
+      "generate:migrations:all": "ts-node -r tsconfig-paths/register src/cli migration:generate --db_unit all --update_last_migration true --migration_name",
+      "generate:migrations:functions": "ts-node -r tsconfig-paths/register src/cli migration:generate --db_unit function --migration_name",
+      "generate:migrations:procedures": "ts-node -r tsconfig-paths/register src/cli migration:generate --db_unit procedure --migration_name",
+      "generate:migrations:triggers": "ts-node -r tsconfig-paths/register src/cli migration:generate --db_unit trigger --migration_name",
+      "generate:migrations:extensions": "ts-node -r tsconfig-paths/register src/cli migration:generate --db_unit extension --migration_name",
+      "apply:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run",
+      "revert:migrations": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert",
+      "database:unit": "ts-node -r tsconfig-paths/register src/cli database:unit --db_unit",
+      "build:units": "ts-node -r tsconfig-paths/register src/cli build:units --directory",
+      "docs": "typedoc --options typedocs.json",
+      "postdocs": "http-server ./docs",
+      "changes": "ts-node -r tsconfig-paths/register src/utils/database-migrations/GitChangedFilesDetector.ts"
    }
 }

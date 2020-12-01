@@ -4,12 +4,19 @@
          "es5",
          "es6"
       ],
-      "target": "es5",
+      "baseUrl": ".",
+      "paths": {
+         "@/*": ["src/*"],
+         "@root/*": ["."]
+      },
+      "target": "es2017",
       "module": "commonjs",
       "moduleResolution": "node",
       "outDir": "./build",
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
-      "sourceMap": true
+      "sourceMap": true,
+      "allowJs": true,
+      "resolveJsonModule": true
    }
 }

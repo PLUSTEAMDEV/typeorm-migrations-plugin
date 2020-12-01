@@ -8,3 +8,4 @@ temp/
 backups
 .env
 config.yaml
+docs

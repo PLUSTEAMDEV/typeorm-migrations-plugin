@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  test-db:
+    container_name: test-db
+    volumes:
+      - edv-data:/var/lib/postgresql
+    restart: unless-stopped
+    ports:
+      - 5434:5432
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+
+volumes:
+  edv-data:
