@@ -5,7 +5,7 @@ import {
   MigrationSqls,
   PsqlUnitType,
 } from "./interfaces";
-import * as CONFIG from "migrationsconfig.json";
+import * as CONFIG from "migrationsconfig";
 import { format } from "@sqltools/formatter/lib/sqlFormatter";
 import { GitChangedFilesDetector } from "./GitChangedFilesDetector";
 import { getFilteredFilesFromPath } from "./utils";

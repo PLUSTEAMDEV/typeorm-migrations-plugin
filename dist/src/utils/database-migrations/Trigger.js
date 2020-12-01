@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Trigger = void 0;
-const CONFIG = require("migrationsconfig.json");
+const CONFIG = require("migrationsconfig");
 const path = require("path");
 class Trigger {
     constructor(options) {

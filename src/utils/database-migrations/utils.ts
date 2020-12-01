@@ -7,7 +7,7 @@ import {
   DatabaseExtension,
   MigrationFunctions,
 } from "./interfaces";
-import * as CONFIG from "migrationsconfig.json";
+import * as CONFIG from "migrationsconfig";
 import { Routine } from "./Routine";
 import { execSync } from "child_process";
 import * as mkdirp from "mkdirp";

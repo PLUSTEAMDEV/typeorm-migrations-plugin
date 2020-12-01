@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MigrationGenerator = void 0;
 const fs = require("fs");
 const path = require("path");
-const CONFIG = require("migrationsconfig.json");
+const CONFIG = require("migrationsconfig");
 const utils_1 = require("../database-migrations/utils");
 const MigrationUtils_1 = require("./MigrationUtils");
 const MigrationFactory_1 = require("./MigrationFactory");

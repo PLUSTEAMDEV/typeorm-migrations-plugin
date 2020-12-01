@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MigrationFactory = void 0;
-const CONFIG = require("migrationsconfig.json");
+const CONFIG = require("migrationsconfig");
 const ExtensionMigration_1 = require("./database-unit-migration/ExtensionMigration");
 const CustomFieldMigration_1 = require("./database-unit-migration/CustomFieldMigration");
 const MigrationUtils_1 = require("./MigrationUtils");

@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MigrationUtils = void 0;
 const path = require("path");
 const fs = require("fs");
-const CONFIG = require("migrationsconfig.json");
+const CONFIG = require("migrationsconfig");
 const sqlFormatter_1 = require("@sqltools/formatter/lib/sqlFormatter");
 const GitChangedFilesDetector_1 = require("./GitChangedFilesDetector");
 const utils_1 = require("./utils");

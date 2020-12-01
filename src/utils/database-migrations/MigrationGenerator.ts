@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as CONFIG from "migrationsconfig.json";
+import * as CONFIG from "migrationsconfig";
 import { createFile } from "../database-migrations/utils";
 import {
   MigrationSqls,

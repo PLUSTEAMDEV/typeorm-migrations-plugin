@@ -5,7 +5,6 @@
 import * as yargs from "yargs";
 import { DatabaseUnitType } from "../interfaces";
 import { MigrationGenerator } from "../MigrationGenerator";
-import * as fs from "fs";
 
 export class MigrationGenerateCommand implements yargs.CommandModule {
   command = "migration:generate";
@@ -36,12 +35,6 @@ export class MigrationGenerateCommand implements yargs.CommandModule {
   }
 
   async handler(args: yargs.Arguments) {
-    const MIGRATION_CONFIG = await import(
-      `${process.cwd()}/migrationsconfig.ts`
-    );
-    if (!MIGRATION_CONFIG)
-      throw new Error("Missing migrations configuration file.");
-    fs.writeFileSync("migrationsconfig.json", JSON.stringify(MIGRATION_CONFIG));
     const generator = new MigrationGenerator({
       migrationName: args.name as string,
       databaseUnitType: args.unit as DatabaseUnitType | "all",

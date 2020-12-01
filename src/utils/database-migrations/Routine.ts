@@ -4,7 +4,7 @@ import {
   RoutineOptions,
   DatabaseColumn,
 } from "./interfaces";
-import * as CONFIG from "migrationsconfig.json";
+import * as CONFIG from "migrationsconfig";
 import { grantAccessToRoutine } from "./utils";
 import { PostgresUtils } from "./PostgresUtils";
 

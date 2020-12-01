@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CONSTRUCTED_EXTENSIONS = exports.getLinesFromCommand = exports.updateCalculatedFields = exports.grantAccessToRoutine = exports.getFilteredFilesFromPath = exports.createFile = exports.createDirectory = void 0;
-const CONFIG = require("migrationsconfig.json");
+const CONFIG = require("migrationsconfig");
 const child_process_1 = require("child_process");
 const mkdirp = require("mkdirp");
 const path = require("path");

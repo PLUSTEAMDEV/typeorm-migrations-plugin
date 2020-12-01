@@ -1,5 +1,5 @@
 import { MigrationFunctions, TriggerOptions } from "./interfaces";
-import * as CONFIG from "migrationsconfig.json";
+import * as CONFIG from "migrationsconfig";
 import * as path from "path";
 
 export class Trigger {

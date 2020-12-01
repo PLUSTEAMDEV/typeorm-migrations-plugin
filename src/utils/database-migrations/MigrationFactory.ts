@@ -5,7 +5,7 @@ import {
   PsqlUnitType,
   PsqlUnitTypeClass,
 } from "./interfaces";
-import * as CONFIG from "migrationsconfig.json";
+import * as CONFIG from "migrationsconfig";
 import { ExtensionMigration } from "./database-unit-migration/ExtensionMigration";
 import { CustomFieldMigration } from "./database-unit-migration/CustomFieldMigration";
 import { MigrationUtils } from "./MigrationUtils";

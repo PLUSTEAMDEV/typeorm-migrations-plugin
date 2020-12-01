@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetDatabaseUnit = void 0;
 const fs = require("fs");
 const path = require("path");
-const CONFIG = require("migrationsconfig.json");
+const CONFIG = require("migrationsconfig");
 class GetDatabaseUnit {
     constructor(options) {
         this.options = options;

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Routine = void 0;
-const CONFIG = require("migrationsconfig.json");
+const CONFIG = require("migrationsconfig");
 const utils_1 = require("./utils");
 const PostgresUtils_1 = require("./PostgresUtils");
 class Routine {
