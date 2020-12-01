@@ -1,6 +1,6 @@
 {
-   "name": "migrations",
-   "version": "0.0.1",
+   "name": "@plustteam/typeorm-migrations-plugin",
+   "version": "0.9.0",
    "description": "Awesome project developed with TypeORM.",
    "devDependencies": {
       "@types/node": "^8.0.29",
