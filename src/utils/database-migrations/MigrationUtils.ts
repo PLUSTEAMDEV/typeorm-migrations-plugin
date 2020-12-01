@@ -4,11 +4,11 @@ import {
   MigrationFileContent,
   MigrationSqls,
   PsqlUnitType,
-} from "@/utils/database-migrations/interfaces";
+} from "./interfaces";
 import * as CONFIG from "migrationsconfig.json";
 import { format } from "@sqltools/formatter/lib/sqlFormatter";
-import { GitChangedFilesDetector } from "@/utils/database-migrations/GitChangedFilesDetector";
-import { getFilteredFilesFromPath } from "@/utils/database-migrations/utils";
+import { GitChangedFilesDetector } from "./GitChangedFilesDetector";
+import { getFilteredFilesFromPath } from "./utils";
 
 export class MigrationUtils {
   /**

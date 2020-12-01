@@ -1,7 +1,4 @@
-import {
-  MigrationFunctions,
-  TriggerOptions,
-} from "@/utils/database-migrations/interfaces";
+import { MigrationFunctions, TriggerOptions } from "./interfaces";
 import * as CONFIG from "migrationsconfig.json";
 import * as path from "path";
 

@@ -1,4 +1,4 @@
-import { BuildPsqlUnitOptions, PsqlUnitTypeClass } from "@/utils/database-migrations/interfaces";
+import { BuildPsqlUnitOptions, PsqlUnitTypeClass } from "./interfaces";
 export declare class BuildPsqlUnits {
     options: BuildPsqlUnitOptions;
     psqlUnitInitialDirectories: {

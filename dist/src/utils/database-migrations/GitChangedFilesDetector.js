@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GitChangedFilesDetector = void 0;
-const utils_1 = require("@/utils/database-migrations/utils");
+const utils_1 = require("./utils");
 class GitChangedFilesDetector {
     static getChangedFiles() {
         const getFileMap = {

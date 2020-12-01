@@ -1,14 +1,14 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as CONFIG from "migrationsconfig.json";
-import { createFile } from "@/utils/database-migrations/utils";
+import { createFile } from "../database-migrations/utils";
 import {
   MigrationSqls,
   GeneratorOptions,
   DatabaseUnitType,
-} from "@/utils/database-migrations/interfaces";
+} from "./interfaces";
 import { MigrationUtils } from "./MigrationUtils";
-import { MigrationFactory } from "@/utils/database-migrations/MigrationFactory";
+import { MigrationFactory } from "./MigrationFactory";
 
 /**
  * Generates or updates the migration file with the changes for:

@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BuildPsqlUnits = void 0;
 const path = require("path");
-const utils_1 = require("@/utils/database-migrations/utils");
-const MigrationUtils_1 = require("@/utils/database-migrations/MigrationUtils");
-const MigrationFactory_1 = require("@/utils/database-migrations/MigrationFactory");
-const Routine_1 = require("@/utils/database-migrations/Routine");
+const utils_1 = require("./utils");
+const MigrationUtils_1 = require("./MigrationUtils");
+const MigrationFactory_1 = require("./MigrationFactory");
+const Routine_1 = require("./Routine");
 class BuildPsqlUnits {
     constructor(options) {
         this.psqlUnitInitialDirectories = {

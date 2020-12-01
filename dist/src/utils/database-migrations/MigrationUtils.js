@@ -5,8 +5,8 @@ const path = require("path");
 const fs = require("fs");
 const CONFIG = require("migrationsconfig.json");
 const sqlFormatter_1 = require("@sqltools/formatter/lib/sqlFormatter");
-const GitChangedFilesDetector_1 = require("@/utils/database-migrations/GitChangedFilesDetector");
-const utils_1 = require("@/utils/database-migrations/utils");
+const GitChangedFilesDetector_1 = require("./GitChangedFilesDetector");
+const utils_1 = require("./utils");
 class MigrationUtils {
     /**
      * Construct the template string with its content.

@@ -2,8 +2,8 @@
  * This file contains functions to help in the migration process.
  * @packageDocumentation
  */
-import { CustomField, MigrationFunctions } from "@/utils/database-migrations/interfaces";
-import { Routine } from "@/utils/database-migrations/Routine";
+import { CustomField, MigrationFunctions } from "./interfaces";
+import { Routine } from "./Routine";
 export declare function createDirectory(directoryPath: string): Promise<void>;
 export declare function createFile(filePath: string, content: string, override?: boolean): Promise<void>;
 export declare function getFilteredFilesFromPath(filePath: string, extension: string): string[];

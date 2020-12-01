@@ -1,5 +1,5 @@
-import { GitFileStatus } from "@/utils/database-migrations/interfaces";
-import { getLinesFromCommand } from "@/utils/database-migrations/utils";
+import { GitFileStatus } from "./interfaces";
+import { getLinesFromCommand } from "./utils";
 
 export class GitChangedFilesDetector {
   static getUnTrackedFiles = getLinesFromCommand.bind(

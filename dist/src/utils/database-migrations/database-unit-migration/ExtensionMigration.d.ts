@@ -1,4 +1,4 @@
-import { DatabaseExtension, DatabaseUnitMigration } from "@/utils/database-migrations/interfaces";
+import { DatabaseExtension, DatabaseUnitMigration } from "../interfaces";
 export declare class ExtensionMigration implements DatabaseUnitMigration {
     downSqls: string[];
     upSqls: string[];

@@ -1,7 +1,4 @@
-import {
-  DatabaseUnitMigration,
-  MigrationFunctions,
-} from "@/utils/database-migrations/interfaces";
+import { DatabaseUnitMigration, MigrationFunctions } from "../interfaces";
 
 export class PsqlUnitMigration implements DatabaseUnitMigration {
   downSqls: string[] = [];

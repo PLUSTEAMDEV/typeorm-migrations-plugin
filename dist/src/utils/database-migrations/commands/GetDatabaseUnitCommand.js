@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetDatabaseUnitCommand = void 0;
-const GetDatabaseUnit_1 = require("@/utils/database-migrations/GetDatabaseUnit");
+const GetDatabaseUnit_1 = require("../GetDatabaseUnit");
 class GetDatabaseUnitCommand {
     constructor() {
         this.command = "database:unit";

@@ -4,9 +4,9 @@ exports.MigrationGenerator = void 0;
 const fs = require("fs");
 const path = require("path");
 const CONFIG = require("migrationsconfig.json");
-const utils_1 = require("@/utils/database-migrations/utils");
+const utils_1 = require("../database-migrations/utils");
 const MigrationUtils_1 = require("./MigrationUtils");
-const MigrationFactory_1 = require("@/utils/database-migrations/MigrationFactory");
+const MigrationFactory_1 = require("./MigrationFactory");
 /**
  * Generates or updates the migration file with the changes for:
  * Triggers, Routines, Extensions and Calculated Table's fields.

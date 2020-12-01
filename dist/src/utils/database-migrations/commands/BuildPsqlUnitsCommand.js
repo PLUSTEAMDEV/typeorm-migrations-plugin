@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BuildPsqlUnitsCommand = void 0;
-const BuildPsqlUnits_1 = require("@/utils/database-migrations/BuildPsqlUnits");
+const BuildPsqlUnits_1 = require("../BuildPsqlUnits");
 class BuildPsqlUnitsCommand {
     constructor() {
         this.command = "build:units";

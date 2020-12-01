@@ -1,4 +1,4 @@
-import { MigrationSqls, GeneratorOptions, DatabaseUnitType } from "@/utils/database-migrations/interfaces";
+import { MigrationSqls, GeneratorOptions, DatabaseUnitType } from "./interfaces";
 /**
  * Generates or updates the migration file with the changes for:
  * Triggers, Routines, Extensions and Calculated Table's fields.

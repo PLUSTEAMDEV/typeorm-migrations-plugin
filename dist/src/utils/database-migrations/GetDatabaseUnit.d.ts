@@ -1,4 +1,4 @@
-import { GetDatabaseUnitOptions, MigrationFunctions } from "@/utils/database-migrations/interfaces";
+import { GetDatabaseUnitOptions, MigrationFunctions } from "./interfaces";
 export declare class GetDatabaseUnit {
     options: GetDatabaseUnitOptions;
     constructor(options: GetDatabaseUnitOptions);

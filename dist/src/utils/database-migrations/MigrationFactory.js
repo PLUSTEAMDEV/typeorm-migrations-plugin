@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MigrationFactory = void 0;
 const CONFIG = require("migrationsconfig.json");
-const ExtensionMigration_1 = require("@/utils/database-migrations/database-unit-migration/ExtensionMigration");
-const CustomFieldMigration_1 = require("@/utils/database-migrations/database-unit-migration/CustomFieldMigration");
-const MigrationUtils_1 = require("@/utils/database-migrations/MigrationUtils");
-const PsqlUnitMigration_1 = require("@/utils/database-migrations/database-unit-migration/PsqlUnitMigration");
+const ExtensionMigration_1 = require("./database-unit-migration/ExtensionMigration");
+const CustomFieldMigration_1 = require("./database-unit-migration/CustomFieldMigration");
+const MigrationUtils_1 = require("./MigrationUtils");
+const PsqlUnitMigration_1 = require("./database-unit-migration/PsqlUnitMigration");
 class MigrationFactory {
     static async getExtensionMigrations() {
         return CONFIG.EXTENSIONS.map((extension) => new ExtensionMigration_1.ExtensionMigration(extension));

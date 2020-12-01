@@ -1,4 +1,4 @@
-import { MigrationFileContent, MigrationSqls, PsqlUnitType } from "@/utils/database-migrations/interfaces";
+import { MigrationFileContent, MigrationSqls, PsqlUnitType } from "./interfaces";
 export declare class MigrationUtils {
     /**
      * Construct the template string with its content.

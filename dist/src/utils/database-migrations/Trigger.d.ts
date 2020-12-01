@@ -1,4 +1,4 @@
-import { MigrationFunctions, TriggerOptions } from "@/utils/database-migrations/interfaces";
+import { MigrationFunctions, TriggerOptions } from "./interfaces";
 export declare class Trigger {
     options: TriggerOptions;
     expression: string;

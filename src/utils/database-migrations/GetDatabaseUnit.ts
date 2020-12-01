@@ -1,10 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as CONFIG from "migrationsconfig.json";
-import {
-  GetDatabaseUnitOptions,
-  MigrationFunctions,
-} from "@/utils/database-migrations/interfaces";
+import { GetDatabaseUnitOptions, MigrationFunctions } from "./interfaces";
 
 export class GetDatabaseUnit {
   options: GetDatabaseUnitOptions;

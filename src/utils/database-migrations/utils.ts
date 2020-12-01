@@ -6,9 +6,9 @@ import {
   CustomField,
   DatabaseExtension,
   MigrationFunctions,
-} from "@/utils/database-migrations/interfaces";
+} from "./interfaces";
 import * as CONFIG from "migrationsconfig.json";
-import { Routine } from "@/utils/database-migrations/Routine";
+import { Routine } from "./Routine";
 import { execSync } from "child_process";
 import * as mkdirp from "mkdirp";
 import * as path from "path";

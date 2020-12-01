@@ -1,5 +1,5 @@
 import * as yargs from "yargs";
-import { BuildPsqlUnits } from "@/utils/database-migrations/BuildPsqlUnits";
+import { BuildPsqlUnits } from "../BuildPsqlUnits";
 
 export class BuildPsqlUnitsCommand implements yargs.CommandModule {
   command = "build:units";

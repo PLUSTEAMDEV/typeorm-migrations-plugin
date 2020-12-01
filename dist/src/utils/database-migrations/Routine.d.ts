@@ -1,4 +1,4 @@
-import { MigrationFunctions, RoutineOptions } from "@/utils/database-migrations/interfaces";
+import { MigrationFunctions, RoutineOptions } from "./interfaces";
 export declare class Routine {
     options: RoutineOptions;
     parameters: string;

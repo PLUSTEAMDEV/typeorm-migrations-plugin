@@ -3,10 +3,10 @@ import {
   MigrationFunctions,
   RoutineOptions,
   DatabaseColumn,
-} from "@/utils/database-migrations/interfaces";
+} from "./interfaces";
 import * as CONFIG from "migrationsconfig.json";
-import { grantAccessToRoutine } from "@/utils/database-migrations/utils";
-import { PostgresUtils } from "@/utils/database-migrations/PostgresUtils";
+import { grantAccessToRoutine } from "./utils";
+import { PostgresUtils } from "./PostgresUtils";
 
 export class Routine {
   options: RoutineOptions;

@@ -1,4 +1,4 @@
-import { CustomField, DatabaseUnitMigration } from "@/utils/database-migrations/interfaces";
+import { CustomField, DatabaseUnitMigration } from "../interfaces";
 export declare class CustomFieldMigration implements DatabaseUnitMigration {
     downSqls: string[];
     upSqls: string[];

@@ -3,8 +3,8 @@
  * @packageDocumentation
  */
 import * as yargs from "yargs";
-import { PsqlUnitType } from "@/utils/database-migrations/interfaces";
-import { GetDatabaseUnit } from "@/utils/database-migrations/GetDatabaseUnit";
+import { PsqlUnitType } from "../interfaces";
+import { GetDatabaseUnit } from "../GetDatabaseUnit";
 
 export class GetDatabaseUnitCommand implements yargs.CommandModule {
   command = "database:unit";

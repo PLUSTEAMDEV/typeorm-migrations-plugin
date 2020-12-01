@@ -3,8 +3,8 @@
  * @packageDocumentation
  */
 import * as yargs from "yargs";
-import { DatabaseUnitType } from "@/utils/database-migrations/interfaces";
-import { MigrationGenerator } from "@/utils/database-migrations/MigrationGenerator";
+import { DatabaseUnitType } from "../interfaces";
+import { MigrationGenerator } from "../MigrationGenerator";
 import * as fs from "fs";
 
 export class MigrationGenerateCommand implements yargs.CommandModule {

@@ -1,12 +1,9 @@
 import * as path from "path";
-import {
-  BuildPsqlUnitOptions,
-  PsqlUnitTypeClass,
-} from "@/utils/database-migrations/interfaces";
-import { createDirectory, createFile } from "@/utils/database-migrations/utils";
-import { MigrationUtils } from "@/utils/database-migrations/MigrationUtils";
-import { MigrationFactory } from "@/utils/database-migrations/MigrationFactory";
-import { Routine } from "@/utils/database-migrations/Routine";
+import { BuildPsqlUnitOptions, PsqlUnitTypeClass } from "./interfaces";
+import { createDirectory, createFile } from "./utils";
+import { MigrationUtils } from "./MigrationUtils";
+import { MigrationFactory } from "./MigrationFactory";
+import { Routine } from "./Routine";
 
 export class BuildPsqlUnits {
   options: BuildPsqlUnitOptions;

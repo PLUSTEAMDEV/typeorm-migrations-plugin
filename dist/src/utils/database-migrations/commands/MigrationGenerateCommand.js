@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MigrationGenerateCommand = void 0;
-const MigrationGenerator_1 = require("@/utils/database-migrations/MigrationGenerator");
+const MigrationGenerator_1 = require("../MigrationGenerator");
 const fs = require("fs");
 class MigrationGenerateCommand {
     constructor() {

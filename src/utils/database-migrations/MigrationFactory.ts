@@ -4,12 +4,12 @@ import {
   MigrationFunctions,
   PsqlUnitType,
   PsqlUnitTypeClass,
-} from "@/utils/database-migrations/interfaces";
+} from "./interfaces";
 import * as CONFIG from "migrationsconfig.json";
-import { ExtensionMigration } from "@/utils/database-migrations/database-unit-migration/ExtensionMigration";
-import { CustomFieldMigration } from "@/utils/database-migrations/database-unit-migration/CustomFieldMigration";
-import { MigrationUtils } from "@/utils/database-migrations/MigrationUtils";
-import { PsqlUnitMigration } from "@/utils/database-migrations/database-unit-migration/PsqlUnitMigration";
+import { ExtensionMigration } from "./database-unit-migration/ExtensionMigration";
+import { CustomFieldMigration } from "./database-unit-migration/CustomFieldMigration";
+import { MigrationUtils } from "./MigrationUtils";
+import { PsqlUnitMigration } from "./database-unit-migration/PsqlUnitMigration";
 
 export class MigrationFactory {
   private static async getExtensionMigrations(): Promise<

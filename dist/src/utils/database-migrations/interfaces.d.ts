@@ -2,8 +2,8 @@ import { SimpleColumnType, WithLengthColumnType, WithPrecisionColumnType } from 
 import { ColumnCommonOptions } from "typeorm/decorator/options/ColumnCommonOptions";
 import { ColumnWithLengthOptions } from "typeorm/decorator/options/ColumnWithLengthOptions";
 import { ColumnNumericOptions } from "typeorm/decorator/options/ColumnNumericOptions";
-import { Trigger } from "@/utils/database-migrations/Trigger";
-import { Routine } from "@/utils/database-migrations/Routine";
+import { Trigger } from "./Trigger";
+import { Routine } from "./Routine";
 interface CreateStructure {
     /** Array of queries to execute before create the structure in the database. */
     beforeCreated?: string[];

@@ -1,4 +1,4 @@
-import { DatabaseUnitType, MigrationFunctions, PsqlUnitTypeClass } from "@/utils/database-migrations/interfaces";
+import { DatabaseUnitType, MigrationFunctions, PsqlUnitTypeClass } from "./interfaces";
 export declare class MigrationFactory {
     private static getExtensionMigrations;
     private static getCustomFieldMigrations;
