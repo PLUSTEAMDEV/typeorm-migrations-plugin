@@ -1,6 +1,6 @@
 {
-   "name": "plus-migrations",
-   "version": "0.0.1",
+   "name": "typeorm-migrations-plugin",
+   "version": "0.9.1",
    "description": "A database migrations tool for PostgreSQL in Node",
    "types": "dist/index.d.ts",
    "main": "dist/index.js",

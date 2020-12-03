@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MigrationGenerateCommand = void 0;
 const MigrationGenerator_1 = require("../MigrationGenerator");
-const fs = require("fs");
 class MigrationGenerateCommand {
     constructor() {
         this.command = "migration:generate";
@@ -31,10 +30,6 @@ class MigrationGenerateCommand {
         });
     }
     async handler(args) {
-        const MIGRATION_CONFIG = await Promise.resolve().then(() => require(`${process.cwd()}/migrationsconfig.ts`));
-        if (!MIGRATION_CONFIG)
-            throw new Error("Missing migrations configuration file.");
-        fs.writeFileSync("migrationsconfig.json", JSON.stringify(MIGRATION_CONFIG));
         const generator = new MigrationGenerator_1.MigrationGenerator({
             migrationName: args.name,
             databaseUnitType: args.unit,
